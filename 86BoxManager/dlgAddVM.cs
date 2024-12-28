@@ -6,7 +6,7 @@ namespace EightySixBoxManager;
 
 public partial class dlgAddVM : Form
 {
-	private frmMain main = (frmMain)Application.OpenForms["frmMain"]; //Instance of frmMain
+	private readonly frmMain main = (frmMain)Application.OpenForms["frmMain"]!; //Instance of frmMain
 	private bool existingVM = false; //Is this importing an existing VM or not
 
 	public dlgAddVM()

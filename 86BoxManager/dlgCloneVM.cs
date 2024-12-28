@@ -6,8 +6,8 @@ namespace EightySixBoxManager;
 
 public partial class dlgCloneVM : Form
 {
-	private string oldPath; //Path of the VM to be cloned
-	private frmMain main = (frmMain)Application.OpenForms["frmMain"]; //Instance of frmMain
+	private readonly string oldPath = string.Empty; //Path of the VM to be cloned
+	private readonly frmMain main = (frmMain)Application.OpenForms["frmMain"]!; //Instance of frmMain
 
 	public dlgCloneVM()
 	{

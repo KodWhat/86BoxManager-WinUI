@@ -79,7 +79,7 @@ public partial class frmMain : Form
 		if (Program.args.Length == 3 && Program.args[1] == "-S" && Program.args[2] != null)
 		{
 			//Find the VM with given name
-			ListViewItem lvi = lstVMs.FindItemWithText(Program.args[2], false, 0, false);
+			ListViewItem? lvi = lstVMs.FindItemWithText(Program.args[2], false, 0, false);
 
 			//Then select and start it if it's found
 			if (lvi != null)
@@ -97,7 +97,13 @@ public partial class frmMain : Form
 
 	private void btnStart_Click(object sender, EventArgs e)
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+
+		if (vm == null)
+		{
+			return;
+		}
+
 		if (vm.Status == VM.STATUS_STOPPED)
 		{
 			VMStart();
@@ -137,7 +143,13 @@ public partial class frmMain : Form
 		else if (lstVMs.SelectedItems.Count == 1)
 		{
 			//Disable relevant buttons if VM is running
-			VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+			VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+
+			if (vm == null)
+			{
+				return;
+			}
+
 			if (vm.Status == VM.STATUS_RUNNING)
 			{
 				btnStart.Enabled = true;
@@ -223,7 +235,7 @@ public partial class frmMain : Form
 		try
 		{
 			//Try to load the settings from registry, if it fails fallback to default values
-			RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
 
 			if (regkey == null)
 			{
@@ -232,6 +244,12 @@ public partial class frmMain : Form
 				//Create the key and reopen it for write access
 				Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
 				regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+
+				if (regkey == null)
+				{
+					throw new ArgumentNullException();
+				}
+
 				regkey.CreateSubKey("Virtual Machines");
 
 				cfgpath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\86Box VMs\";
@@ -251,6 +269,12 @@ public partial class frmMain : Form
 
 				//Defaults must also be written to the registry
 				regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+
+				if (regkey == null)
+				{
+					throw new ArgumentNullException();
+				}
+
 				regkey.SetValue("EXEdir", exepath, RegistryValueKind.String);
 				regkey.SetValue("CFGdir", cfgpath, RegistryValueKind.String);
 				regkey.SetValue("MinimizeOnVMStart", minimize, RegistryValueKind.DWord);
@@ -265,17 +289,17 @@ public partial class frmMain : Form
 			}
 			else
 			{
-				exepath = regkey.GetValue("EXEdir").ToString();
-				cfgpath = regkey.GetValue("CFGdir").ToString();
+				exepath = regkey.GetValue("EXEdir")?.ToString() ?? string.Empty;
+				cfgpath = regkey.GetValue("CFGdir")?.ToString() ?? string.Empty;
 				minimize = Convert.ToBoolean(regkey.GetValue("MinimizeOnVMStart"));
 				showConsole = Convert.ToBoolean(regkey.GetValue("ShowConsole"));
 				minimizeTray = Convert.ToBoolean(regkey.GetValue("MinimizeToTray"));
 				closeTray = Convert.ToBoolean(regkey.GetValue("CloseToTray"));
-				logpath = regkey.GetValue("LogPath").ToString();
+				logpath = regkey.GetValue("LogPath")?.ToString() ?? string.Empty;
 				logging = Convert.ToBoolean(regkey.GetValue("EnableLogging"));
 				gridlines = Convert.ToBoolean(regkey.GetValue("EnableGridLines"));
-				sortColumn = (int)regkey.GetValue("SortColumn");
-				sortOrder = (SortOrder)regkey.GetValue("SortOrder");
+				sortColumn = (int)(regkey.GetValue("SortColumn") ?? 0);
+				sortOrder = (SortOrder)(regkey.GetValue("SortOrder") ?? 0);
 
 				lstVMs.GridLines = gridlines;
 				VMSort(sortColumn, sortOrder);
@@ -284,16 +308,16 @@ public partial class frmMain : Form
 			regkey.Close();
 
 			//To make sure there's a trailing backslash at the end, as other code using these strings expects it!
-			if (!exepath.EndsWith(@"\"))
+			if (!exepath.EndsWith('\\'))
 			{
 				exepath += @"\";
 			}
-			if (!cfgpath.EndsWith(@"\"))
+			if (!cfgpath.EndsWith('\\'))
 			{
 				cfgpath += @"\";
 			}
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			MessageBox.Show("An error occured trying to load the 86Box Manager registry keys and/or values. Make sure you have the required permissions and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			Application.Exit();
@@ -308,12 +332,12 @@ public partial class frmMain : Form
 		VMCountRefresh();
 		try
 		{
-			RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines");
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines") ?? throw new ArgumentNullException();
 			VM vm = new VM();
 
 			foreach (var value in regkey.GetValueNames())
 			{
-				MemoryStream ms = new MemoryStream((byte[])regkey.GetValue(value));
+				MemoryStream ms = new MemoryStream((byte[])regkey.GetValue(value)!);
 
 				SerializationBinder binder = new ClassicSerializationBinder();
 
@@ -344,16 +368,20 @@ public partial class frmMain : Form
 
 			VMCountRefresh();
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			MessageBox.Show("The Virtual Machines registry key could not be opened, so no stored virtual machines can be used. Make sure you have the required permissions and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 	}
 
 	//Wait for the associated window of a VM to close
-	private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+	private void backgroundWorker_DoWork(object? sender, DoWorkEventArgs e)
 	{
-		VM vm = e.Argument as VM;
+		if (e.Argument is not VM vm)
+		{
+			return;
+		}
+
 		try
 		{
 			Process p = Process.GetProcessById(vm.Pid); //Find the process associated with the VM
@@ -367,14 +395,17 @@ public partial class frmMain : Form
 	}
 
 	//Update the UI once the VM's window is closed
-	private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+	private void backgroundWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
 	{
-		VM vm = e.Result as VM;
+		if (e.Result is not VM vm)
+		{
+			return;
+		}
 
 		//Go through the listview, find the item representing the VM and update things accordingly
 		foreach (ListViewItem item in lstVMs.Items)
 		{
-			if (item.Tag.Equals(vm))
+			if (item.Tag != null && item.Tag.Equals(vm))
 			{
 				vm.Status = VM.STATUS_STOPPED;
 				vm.hWnd = IntPtr.Zero;
@@ -409,7 +440,13 @@ public partial class frmMain : Form
 		}
 		else if (lstVMs.SelectedItems.Count == 1)
 		{
-			VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+			VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+
+			if (vm == null)
+			{
+				return;
+			}
+
 			switch (vm.Status)
 			{
 				case VM.STATUS_RUNNING:
@@ -507,8 +544,9 @@ public partial class frmMain : Form
 		{
 			foreach (ListViewItem item in lstVMs.Items)
 			{
-				VM vm = (VM)item.Tag;
-				if (vm.Status != VM.STATUS_STOPPED && Visible)
+				VM? vm = (VM?)item.Tag;
+
+				if (vm != null && vm.Status != VM.STATUS_STOPPED && Visible)
 				{
 					vmCount++;
 				}
@@ -525,8 +563,8 @@ public partial class frmMain : Form
 				foreach (ListViewItem lvi in lstVMs.Items)
 				{
 					lstVMs.SelectedItems.Clear(); //To prevent weird stuff
-					VM vm = (VM)lvi.Tag;
-					if (vm.Status != VM.STATUS_STOPPED)
+					VM? vm = (VM?)lvi.Tag;
+					if (vm != null && vm.Status != VM.STATUS_STOPPED)
 					{
 						lvi.Focused = true;
 						lvi.Selected = true;
@@ -562,7 +600,12 @@ public partial class frmMain : Form
 
 	private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+		if (vm == null)
+		{
+			return;
+		}
+
 		if (vm.Status == VM.STATUS_PAUSED)
 		{
 			VMResume();
@@ -576,7 +619,12 @@ public partial class frmMain : Form
 	//Pauses the selected VM
 	private void VMPause()
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+		if (vm == null)
+		{
+			return;
+		}
+
 		PostMessage(vm.hWnd, 0x8890, IntPtr.Zero, IntPtr.Zero);
 		lstVMs.SelectedItems[0].SubItems[1].Text = vm.GetStatusString();
 		lstVMs.SelectedItems[0].ImageIndex = 2;
@@ -598,7 +646,12 @@ public partial class frmMain : Form
 	//Resumes the selected VM
 	private void VMResume()
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+		if (vm == null)
+		{
+			return;
+		}
+
 		PostMessage(vm.hWnd, 0x8890, IntPtr.Zero, IntPtr.Zero);
 		vm.Status = VM.STATUS_RUNNING;
 		lstVMs.SelectedItems[0].SubItems[1].Text = vm.GetStatusString();
@@ -622,7 +675,11 @@ public partial class frmMain : Form
 	{
 		try
 		{
-			VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+			VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+			if (vm == null)
+			{
+				return;
+			}
 
 			/* This generates a VM ID on the fly from the VM path. The reason it's done this way is it doesn't break existing VMs and doesn't require
 			 * extensive modifications to this legacy version for it to work with newer 86Box versions...
@@ -691,11 +748,11 @@ public partial class frmMain : Form
 				VMCountRefresh();
 			}
 		}
-		catch (InvalidOperationException ex)
+		catch (InvalidOperationException)
 		{
 			MessageBox.Show("The process failed to initialize or its window handle could not be obtained.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
-		catch (Win32Exception ex)
+		catch (Win32Exception)
 		{
 			MessageBox.Show("Cannot find 86Box.exe. Make sure your settings are correct and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
@@ -711,15 +768,15 @@ public partial class frmMain : Form
 	//Sends a running/pause VM a request to stop without asking the user for confirmation
 	private void VMForceStop()
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
 		try
 		{
-			if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
+			if (vm != null && (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED))
 			{
 				PostMessage(vm.hWnd, 0x8893, new IntPtr(1), IntPtr.Zero);
 			}
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			MessageBox.Show("An error occurred trying to stop the selected virtual machine.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
@@ -731,16 +788,16 @@ public partial class frmMain : Form
 	//Sends a running/paused VM a request to stop and asking the user for confirmation
 	private void VMRequestStop()
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
 		try
 		{
-			if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
+			if (vm != null && (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED))
 			{
 				PostMessage(vm.hWnd, 0x8893, IntPtr.Zero, IntPtr.Zero);
 				SetForegroundWindow(vm.hWnd);
 			}
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			MessageBox.Show("An error occurred trying to stop the selected virtual machine.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
@@ -752,7 +809,12 @@ public partial class frmMain : Form
 	//Start VM if it's stopped or stop it if it's running/paused
 	private void startToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+		if (vm == null)
+		{
+			return;
+		}
+
 		if (vm.Status == VM.STATUS_STOPPED)
 		{
 			VMStart();
@@ -771,7 +833,12 @@ public partial class frmMain : Form
 	//Opens the settings window for the selected VM
 	private void VMConfigure()
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+
+		if (vm == null)
+		{
+			return;
+		}
 
 		//If the VM is already running, only send the message to open the settings window. Otherwise, start the VM with the -S parameter
 		if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
@@ -825,7 +892,7 @@ public partial class frmMain : Form
 				pauseToolStripMenuItem.ToolTipText = "Pause this virtual machine";
 				btnCtrlAltDel.Enabled = false;
 			}
-			catch (Win32Exception ex)
+			catch (Win32Exception)
 			{
 				MessageBox.Show("Cannot find 86Box.exe. Make sure your settings are correct and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
@@ -851,8 +918,8 @@ public partial class frmMain : Form
 	//Sends the CTRL+ALT+DEL keystroke to the VM, result depends on the guest OS
 	private void VMCtrlAltDel()
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
-		if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+		if (vm != null && (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED))
 		{
 			PostMessage(vm.hWnd, 0x8894, IntPtr.Zero, IntPtr.Zero);
 			vm.Status = VM.STATUS_RUNNING;
@@ -873,8 +940,8 @@ public partial class frmMain : Form
 	//Performs a hard reset for the selected VM
 	private void VMHardReset()
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
-		if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+		if (vm != null && (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED))
 		{
 			PostMessage(vm.hWnd, 0x8892, IntPtr.Zero, IntPtr.Zero);
 			SetForegroundWindow(vm.hWnd);
@@ -889,7 +956,12 @@ public partial class frmMain : Form
 		{
 			if (lstVMs.SelectedItems[0].Bounds.Contains(e.Location))
 			{
-				VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+				VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+				if (vm == null)
+				{
+					return;
+				}
+
 				if (vm.Status == VM.STATUS_STOPPED)
 				{
 					VMStart();
@@ -927,7 +999,11 @@ public partial class frmMain : Form
 			formatter.Serialize(ms, newVM);
 			var data = ms.ToArray();
 
-			RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+			if (regkey == null)
+			{
+				return;
+			}
 			regkey.SetValue(newVM.Name, data, RegistryValueKind.Binary);
 		}
 
@@ -960,10 +1036,15 @@ public partial class frmMain : Form
 	{
 		try
 		{
-			RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
 			if (regkey == null) //Regkey doesn't exist yet
 			{
 				regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+				if (regkey == null)
+				{
+					throw new ArgumentNullException(); ;
+				}
+
 				regkey.CreateSubKey(@"Virtual Machines");
 				return false;
 			}
@@ -980,7 +1061,7 @@ public partial class frmMain : Form
 				return true;
 			}
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			MessageBox.Show("Could not load the virtual machine information from the registry. Make sure you have the required permissions and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			return false;
@@ -990,7 +1071,12 @@ public partial class frmMain : Form
 	//Changes a VM's name and/or description
 	public void VMEdit(string name, string desc)
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+		if (vm == null)
+		{
+			return;
+		}
+
 		string oldname = vm.Name;
 		if (!vm.Name.Equals(name))
 		{
@@ -998,7 +1084,7 @@ public partial class frmMain : Form
 			{ //Move the actual VM files too. This will invalidate any paths inside the cfg, but the user is informed to update those manually.
 				Directory.Move(cfgpath + vm.Name, cfgpath + name);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				MessageBox.Show("An error has occurred while trying to move the files for this virtual machine. Please try to move them manually.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
@@ -1008,7 +1094,12 @@ public partial class frmMain : Form
 		vm.Desc = desc;
 
 		//Create a new registry value with new info, delete the old one
-		RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+		RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+		if (regkey == null)
+		{
+			return;
+		}
+
 		using (var ms = new MemoryStream())
 		{
 			regkey.DeleteValue(oldname);
@@ -1016,6 +1107,11 @@ public partial class frmMain : Form
 			formatter.Serialize(ms, vm);
 			var data = ms.ToArray();
 			regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+			if (regkey == null)
+			{
+				return;
+			}
+
 			regkey.SetValue(vm.Name, data, RegistryValueKind.Binary);
 		}
 		regkey.Close();
@@ -1035,7 +1131,12 @@ public partial class frmMain : Form
 	{
 		foreach (ListViewItem lvi in lstVMs.SelectedItems)
 		{
-			VM vm = (VM)lvi.Tag;//(VM)lstVMs.SelectedItems[0].Tag;
+			VM? vm = (VM?)lvi.Tag;//(VM)lstVMs.SelectedItems[0].Tag;
+			if (vm == null)
+			{
+				return;
+			}
+
 			DialogResult result1 = MessageBox.Show("Are you sure you want to remove the virtual machine \"" + vm.Name + "\"?", "Remove virtual machine", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
 			if (result1 == DialogResult.Yes)
@@ -1048,7 +1149,13 @@ public partial class frmMain : Form
 				try
 				{
 					lstVMs.Items.Remove(lvi);
-					RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+					RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+
+					if (regkey == null)
+					{
+						return;
+					}
+
 					regkey.DeleteValue(vm.Name);
 					regkey.Close();
 				}
@@ -1117,7 +1224,12 @@ public partial class frmMain : Form
 
 	private void btnPause_Click(object sender, EventArgs e)
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+		if (vm == null)
+		{
+			return;
+		}
+
 		if (vm.Status == VM.STATUS_PAUSED)
 		{
 			VMResume();
@@ -1141,14 +1253,14 @@ public partial class frmMain : Form
 			{
 				foreach (ListViewItem lvi in lstVMs.Items)
 				{
-					VM vm = (VM)lvi.Tag;
-					int tempid = vm.Path.GetHashCode(); //This can return negative integers, which is a no-no for 86Box, hence the shift up by int.MaxValue
-					uint id = 0;
-					if (tempid < 0)
-						id = (uint)(tempid + int.MaxValue);
-					else
-						id = (uint)tempid;
+					VM? vm = (VM?)lvi.Tag;
+					if (vm == null)
+					{
+						continue;
+					}
 
+					int tempid = vm.Path.GetHashCode(); //This can return negative integers, which is a no-no for 86Box, hence the shift up by int.MaxValue
+					uint id = tempid < 0 ? (uint)(tempid + int.MaxValue) : (uint)tempid;
 					if (id == (uint)m.WParam.ToInt32())
 					{
 						vm.hWnd = m.LParam;
@@ -1163,8 +1275,8 @@ public partial class frmMain : Form
 			{
 				foreach (ListViewItem lvi in lstVMs.Items)
 				{
-					VM vm = (VM)lvi.Tag;
-					if (vm.hWnd.Equals(m.LParam) && vm.Status != VM.STATUS_PAUSED)
+					VM? vm = (VM?)lvi.Tag;
+					if (vm != null && vm.hWnd.Equals(m.LParam) && vm.Status != VM.STATUS_PAUSED)
 					{
 						vm.Status = VM.STATUS_PAUSED;
 						lvi.SubItems[1].Text = vm.GetStatusString();
@@ -1187,8 +1299,8 @@ public partial class frmMain : Form
 			{
 				foreach (ListViewItem lvi in lstVMs.Items)
 				{
-					VM vm = (VM)lvi.Tag;
-					if (vm.hWnd == m.LParam && vm.Status != VM.STATUS_RUNNING)
+					VM? vm = (VM?)lvi.Tag;
+					if (vm != null && vm.hWnd == m.LParam && vm.Status != VM.STATUS_RUNNING)
 					{
 						vm.Status = VM.STATUS_RUNNING;
 						lvi.SubItems[1].Text = vm.GetStatusString();
@@ -1214,8 +1326,8 @@ public partial class frmMain : Form
 			{
 				foreach (ListViewItem lvi in lstVMs.Items)
 				{
-					VM vm = (VM)lvi.Tag;
-					if (vm.hWnd == m.LParam && vm.Status != VM.STATUS_WAITING)
+					VM? vm = (VM?)lvi.Tag;
+					if (vm != null && vm.hWnd == m.LParam && vm.Status != VM.STATUS_WAITING)
 					{
 						vm.Status = VM.STATUS_WAITING;
 						lvi.SubItems[1].Text = vm.GetStatusString();
@@ -1239,8 +1351,8 @@ public partial class frmMain : Form
 			{
 				foreach (ListViewItem lvi in lstVMs.Items)
 				{
-					VM vm = (VM)lvi.Tag;
-					if (vm.hWnd == m.LParam && vm.Status != VM.STATUS_RUNNING)
+					VM? vm = (VM?)lvi.Tag;
+					if (vm != null && vm.hWnd == m.LParam && vm.Status != VM.STATUS_RUNNING)
 					{
 						vm.Status = VM.STATUS_RUNNING;
 						lvi.SubItems[1].Text = vm.GetStatusString();
@@ -1270,8 +1382,8 @@ public partial class frmMain : Form
 		{
 			foreach (ListViewItem lvi in lstVMs.Items)
 			{
-				VM vm = (VM)lvi.Tag;
-				if (vm.hWnd.Equals(m.LParam) && vm.Status != VM.STATUS_STOPPED)
+				VM? vm = (VM?)lvi.Tag;
+				if (vm != null && vm.hWnd.Equals(m.LParam) && vm.Status != VM.STATUS_STOPPED)
 				{
 					vm.Status = VM.STATUS_STOPPED;
 					vm.hWnd = IntPtr.Zero;
@@ -1325,14 +1437,23 @@ public partial class frmMain : Form
 		if (m.Msg == 0x004A)
 		{
 			//Get the VM name and find the associated LVI and VM object
-			COPYDATASTRUCT ds = (COPYDATASTRUCT)m.GetLParam(typeof(COPYDATASTRUCT));
-			string vmName = Marshal.PtrToStringAnsi(ds.lpData, ds.cbData);
-			ListViewItem lvi = lstVMs.FindItemWithText(vmName);
+			COPYDATASTRUCT? ds = (COPYDATASTRUCT?)m.GetLParam(typeof(COPYDATASTRUCT));
+			if (ds == null)
+			{
+				return;
+			}
+			string vmName = Marshal.PtrToStringAnsi(ds.Value.lpData, ds.Value.cbData);
+			ListViewItem? lvi = lstVMs.FindItemWithText(vmName);
 
 			//This check is necessary in case the specified VM was already removed but the shortcut remains
 			if (lvi != null)
 			{
-				VM vm = (VM)lvi.Tag;
+				VM? vm = (VM?)lvi.Tag;
+
+				if (vm == null)
+				{
+					return;
+				}
 
 				//If the VM is already running, display a message, otherwise, start it
 				if (vm.Status != VM.STATUS_STOPPED)
@@ -1367,12 +1488,17 @@ public partial class frmMain : Form
 	{
 		foreach (ListViewItem lvi in lstVMs.SelectedItems)
 		{
-			VM vm = (VM)lvi.Tag;
+			VM? vm = (VM?)lvi.Tag;
+			if (vm == null)
+			{
+				return;
+			}
+
 			try
 			{
 				Process.Start(vm.Path);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				MessageBox.Show("The folder for the virtual machine \"" + vm.Name + "\" could not be opened. Make sure it still exists and that you have sufficient privileges to access it.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
@@ -1383,7 +1509,12 @@ public partial class frmMain : Form
 	{
 		foreach (ListViewItem lvi in lstVMs.SelectedItems)
 		{
-			VM vm = (VM)lvi.Tag;
+			VM? vm = (VM?)lvi.Tag;
+			if (vm == null)
+			{
+				continue;
+			}
+
 			try
 			{
 				WshShell shell = new WshShell();
@@ -1397,7 +1528,7 @@ public partial class frmMain : Form
 
 				MessageBox.Show("A desktop shortcut for the virtual machine \"" + vm.Name + "\" was successfully created.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				MessageBox.Show("A desktop shortcut for the virtual machine \"" + vm.Name + "\" could not be created.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
@@ -1409,7 +1540,11 @@ public partial class frmMain : Form
 	{
 		if (e.KeyCode == Keys.Enter && lstVMs.SelectedItems.Count == 1)
 		{
-			VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+			VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+			if (vm == null)
+			{
+				return;
+			}
 			if (vm.Status == VM.STATUS_RUNNING)
 			{
 				VMRequestStop();
@@ -1439,8 +1574,8 @@ public partial class frmMain : Form
 		int vmCount = 0;
 		foreach (ListViewItem item in lstVMs.Items)
 		{
-			VM vm = (VM)item.Tag;
-			if (vm.Status != VM.STATUS_STOPPED)
+			VM? vm = (VM?)item.Tag;
+			if (vm != null && vm.Status != VM.STATUS_STOPPED)
 			{
 				vmCount++;
 			}
@@ -1454,9 +1589,9 @@ public partial class frmMain : Form
 			{
 				foreach (ListViewItem lvi in lstVMs.Items)
 				{
-					VM vm = (VM)lvi.Tag;
+					VM? vm = (VM?)lvi.Tag;
 					lstVMs.SelectedItems.Clear();
-					if (vm.Status != VM.STATUS_STOPPED)
+					if (vm != null && vm.Status != VM.STATUS_STOPPED)
 					{
 						lvi.Focused = true;
 						lvi.Selected = true;
@@ -1514,7 +1649,11 @@ public partial class frmMain : Form
 	{
 		foreach (ListViewItem lvi in lstVMs.SelectedItems)
 		{
-			VM vm = (VM)lvi.Tag;
+			VM? vm = (VM?)lvi.Tag;
+			if (vm == null)
+			{
+				continue;
+			}
 
 			//Ask the user to confirm
 			DialogResult = MessageBox.Show("Killing a virtual machine can cause data loss. Only do this if 86Box.exe process gets stuck.\n\nDo you really wish to kill the virtual machine \"" + vm.Name + "\"?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
@@ -1525,7 +1664,7 @@ public partial class frmMain : Form
 					Process p = Process.GetProcessById(vm.Pid);
 					p.Kill();
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					MessageBox.Show("Could not kill 86Box.exe process for virtual machine \"" + vm.Name + "\". The process may have already ended on its own or access was denied.", "Could not kill process", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					continue;
@@ -1608,12 +1747,18 @@ public partial class frmMain : Form
 		//Save the new column and order to the registry
 		try
 		{
-			RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+
+			if (regkey == null)
+			{
+				return;
+			}
+
 			regkey.SetValue("SortColumn", sortColumn, RegistryValueKind.DWord);
 			regkey.SetValue("SortOrder", sortOrder, RegistryValueKind.DWord);
 			regkey.Close();
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			MessageBox.Show("Could not save the column sorting state to the registry. Make sure you have the required permissions and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
@@ -1642,7 +1787,11 @@ public partial class frmMain : Form
 	{
 		foreach (ListViewItem lvi in lstVMs.SelectedItems)
 		{
-			VM vm = (VM)lvi.Tag;
+			VM? vm = (VM?)lvi.Tag;
+			if (vm == null)
+			{
+				continue;
+			}
 
 			DialogResult = MessageBox.Show("Wiping a virtual machine deletes its configuration and nvr files. You'll have to reconfigure the virtual machine (and the BIOS if applicable).\n\n Are you sure you wish to wipe the virtual machine \"" + vm.Name + "\"?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 			if (DialogResult == DialogResult.Yes)
@@ -1658,7 +1807,7 @@ public partial class frmMain : Form
 					Directory.Delete(vm.Path + @"\nvr", true);
 					MessageBox.Show("The virtual machine \"" + vm.Name + "\" was successfully wiped.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					MessageBox.Show("An error occurred trying to wipe the virtual machine \"" + vm.Name + "\".", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					continue;
@@ -1696,7 +1845,7 @@ public partial class frmMain : Form
 				System.IO.File.Copy(newPath, newPath.Replace(importPath, newVM.Path), true);
 			}
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			importFailed = true; //Set this flag so we can inform the user at the end
 		}
@@ -1706,7 +1855,11 @@ public partial class frmMain : Form
 			var formatter = new BinaryFormatter();
 			formatter.Serialize(ms, newVM);
 			var data = ms.ToArray();
-			RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
+			if (regkey == null)
+			{
+				return;
+			}
 			regkey.SetValue(newVM.Name, data, RegistryValueKind.Binary);
 		}
 
@@ -1743,7 +1896,12 @@ public partial class frmMain : Form
 
 	private void cloneToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		VM vm = (VM)lstVMs.SelectedItems[0].Tag;
+		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
+		if (vm == null)
+		{
+			return;
+		}
+
 		dlgCloneVM dc = new dlgCloneVM(vm.Path);
 		dc.ShowDialog();
 		dc.Dispose();
@@ -1759,7 +1917,11 @@ public partial class frmMain : Form
 
 		foreach (ListViewItem lvi in lstVMs.Items)
 		{
-			VM vm = (VM)lvi.Tag;
+			VM? vm = (VM?)lvi.Tag;
+			if (vm == null)
+			{
+				continue;
+			}
 			switch (vm.Status)
 			{
 				case VM.STATUS_PAUSED: pausedVMs++; break;
@@ -1781,12 +1943,16 @@ public partial class frmMain : Form
 	{
 		foreach (ListViewItem lvi in lstVMs.SelectedItems)
 		{
-			VM vm = (VM)lvi.Tag;
+			VM? vm = (VM?)lvi.Tag;
+			if (vm == null)
+			{
+				continue;
+			}
 			try
 			{
 				Process.Start(vm.Path + Path.DirectorySeparatorChar + "86box.cfg");
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				MessageBox.Show("The config file for the virtual machine \"" + vm.Name + "\" could not be opened. Make sure it still exists and that you have sufficient privileges to access it.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}

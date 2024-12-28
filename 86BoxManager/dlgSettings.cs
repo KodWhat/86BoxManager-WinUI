@@ -107,7 +107,7 @@ public partial class dlgSettings : Form
 				lbl86BoxVer1.ForeColor = Color.Red;
 			}
 		}
-		catch (FileNotFoundException ex)
+		catch (FileNotFoundException)
 		{
 			lbl86BoxVer1.Text = "86Box.exe not found";
 			lbl86BoxVer1.ForeColor = Color.Gray;
@@ -136,11 +136,14 @@ public partial class dlgSettings : Form
 		}
 		try
 		{
-			RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true); //Try to open the key first (in read-write mode) to see if it already exists
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true); //Try to open the key first (in read-write mode) to see if it already exists
 			if (regkey == null) //Regkey doesn't exist yet, must be created first and then reopened
 			{
-				Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
-				regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+				regkey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
+				if (regkey == null)
+				{
+					throw new ArgumentNullException();
+				}
 				regkey.CreateSubKey("Virtual Machines");
 			}
 
@@ -176,7 +179,7 @@ public partial class dlgSettings : Form
 	{
 		try
 		{
-			RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", false); //Open the key as read only
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", false); //Open the key as read only
 
 			//If the key doesn't exist yet, fallback to defaults
 			if (regkey == null)
@@ -184,8 +187,11 @@ public partial class dlgSettings : Form
 				MessageBox.Show("86Box Manager settings could not be loaded. This is normal if you're running 86Box Manager for the first time. Default values will be used.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
 				//Create the key and reopen it for write access
-				Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
-				regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+				regkey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
+				if (regkey == null)
+				{
+					throw new ArgumentNullException();
+				}
 				regkey.CreateSubKey("Virtual Machines");
 
 				txtCFGdir.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\86Box VMs\";
@@ -204,9 +210,9 @@ public partial class dlgSettings : Form
 			}
 			else
 			{
-				txtEXEdir.Text = regkey.GetValue("EXEdir").ToString();
-				txtCFGdir.Text = regkey.GetValue("CFGdir").ToString();
-				txtLogPath.Text = regkey.GetValue("LogPath").ToString();
+				txtEXEdir.Text = regkey.GetValue("EXEdir")?.ToString() ?? string.Empty;
+				txtCFGdir.Text = regkey.GetValue("CFGdir")?.ToString() ?? string.Empty;
+				txtLogPath.Text = regkey.GetValue("LogPath")?.ToString() ?? string.Empty;
 				cbxMinimize.Checked = Convert.ToBoolean(regkey.GetValue("MinimizeOnVMStart"));
 				cbxShowConsole.Checked = Convert.ToBoolean(regkey.GetValue("ShowConsole"));
 				cbxMinimizeTray.Checked = Convert.ToBoolean(regkey.GetValue("MinimizeToTray"));
@@ -219,7 +225,7 @@ public partial class dlgSettings : Form
 
 			regkey.Close();
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			MessageBox.Show("86Box Manager settings could not be loaded, because an error occured trying to load the registry keys and/or values. Make sure you have the required permissions and try again. Default values will be used now.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
@@ -248,7 +254,7 @@ public partial class dlgSettings : Form
 		if (dialog.Show(Handle))
 		{
 			txtEXEdir.Text = dialog.FileName;
-			if (!txtEXEdir.Text.EndsWith(@"\")) //Just in case
+			if (!txtEXEdir.Text.EndsWith('\\')) //Just in case
 			{
 				txtEXEdir.Text += @"\";
 			}
@@ -266,7 +272,7 @@ public partial class dlgSettings : Form
 		if (dialog.Show(Handle))
 		{
 			txtCFGdir.Text = dialog.FileName;
-			if (!txtCFGdir.Text.EndsWith(@"\")) //Just in case
+			if (!txtCFGdir.Text.EndsWith('\\')) //Just in case
 			{
 				txtCFGdir.Text += @"\";
 			}
@@ -285,11 +291,14 @@ public partial class dlgSettings : Form
 	//Resets the settings to their default values
 	private void ResetSettings()
 	{
-		RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+		RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
 		if (regkey == null)
 		{
-			Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
-			regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+			regkey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
+			if (regkey == null)
+			{
+				throw new ArgumentNullException();
+			}
 			regkey.CreateSubKey("Virtual Machines");
 		}
 		regkey.Close();
@@ -312,14 +321,18 @@ public partial class dlgSettings : Form
 	//Checks if all controls match the currently saved settings to determine if any changes were made
 	private bool CheckForChanges()
 	{
-		RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box");
+		RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box");
+		if (regkey == null)
+		{
+			return true;
+		}
 
 		try
 		{
 			btnApply.Enabled = (
-				txtEXEdir.Text != regkey.GetValue("EXEdir").ToString() ||
-				txtCFGdir.Text != regkey.GetValue("CFGdir").ToString() ||
-				txtLogPath.Text != regkey.GetValue("LogPath").ToString() ||
+				txtEXEdir.Text != regkey.GetValue("EXEdir")?.ToString() ||
+				txtCFGdir.Text != regkey.GetValue("CFGdir")?.ToString() ||
+				txtLogPath.Text != regkey.GetValue("LogPath")?.ToString() ||
 				cbxMinimize.Checked != Convert.ToBoolean(regkey.GetValue("MinimizeOnVMStart")) ||
 				cbxShowConsole.Checked != Convert.ToBoolean(regkey.GetValue("ShowConsole")) ||
 				cbxMinimizeTray.Checked != Convert.ToBoolean(regkey.GetValue("MinimizeToTray")) ||
@@ -355,11 +368,13 @@ public partial class dlgSettings : Form
 
 	private void btnBrowse3_Click(object sender, EventArgs e)
 	{
-		SaveFileDialog ofd = new SaveFileDialog();
-		ofd.DefaultExt = "log";
-		ofd.Title = "Select a file where 86Box logs will be saved";
-		ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer);
-		ofd.Filter = "Log files (*.log)|*.log";
+		SaveFileDialog ofd = new SaveFileDialog
+		{
+			DefaultExt = "log",
+			Title = "Select a file where 86Box logs will be saved",
+			InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
+			Filter = "Log files (*.log)|*.log"
+		};
 
 		if (ofd.ShowDialog() == DialogResult.OK)
 		{
