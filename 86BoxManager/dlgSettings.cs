@@ -4,13 +4,15 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
-using Microsoft.Win32;
+using EightySixBoxManager.Core.Settings;
 
 namespace EightySixBoxManager;
 
 public partial class dlgSettings : Form
 {
 	private bool settingsChanged = false; //Keeps track of unsaved changes
+
+	private readonly frmMain main = (frmMain)Application.OpenForms["frmMain"]!; //Instance of frmMain
 
 	public dlgSettings()
 	{
@@ -126,7 +128,7 @@ public partial class dlgSettings : Form
 				return false;
 			}
 		}
-		if (!File.Exists(txtEXEdir.Text + "86Box.exe") && !File.Exists(txtEXEdir.Text + @"\86Box.exe"))
+		if (!File.Exists(Path.Combine(txtEXEdir.Text, "86Box.exe")))
 		{
 			DialogResult result = MessageBox.Show("86Box.exe could not be found in the directory you specified, so you won't be able to use any virtual machines. Are you sure you want to use this path?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 			if (result == DialogResult.No)
@@ -136,28 +138,22 @@ public partial class dlgSettings : Form
 		}
 		try
 		{
-			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true); //Try to open the key first (in read-write mode) to see if it already exists
-			if (regkey == null) //Regkey doesn't exist yet, must be created first and then reopened
+			SettingsValues newSettings = new()
 			{
-				regkey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
-				if (regkey == null)
-				{
-					throw new ArgumentNullException();
-				}
-				regkey.CreateSubKey("Virtual Machines");
-			}
+				BoxExePath = txtEXEdir.Text,
+				VmPath = txtCFGdir.Text,
+				MinimizeOnVMStart = cbxMinimize.Checked,
+				ShowConsole = cbxShowConsole.Checked,
+				MinimizeToTray = cbxMinimizeTray.Checked,
+				CloseToTray = cbxCloseTray.Checked,
+				LogPath = txtLogPath.Text,
+				LoggingEnabled = cbxLogging.Checked,
+				ShowGridLines = cbxGrid.Checked,
+				SortColumn = main.SettingsProvider.SettingsValues.SortColumn,
+				SortOrder = main.SettingsProvider.SettingsValues.SortOrder
+			};
 
-			//Store the new values, close the key, changes are saved
-			regkey.SetValue("EXEdir", txtEXEdir.Text, RegistryValueKind.String);
-			regkey.SetValue("CFGdir", txtCFGdir.Text, RegistryValueKind.String);
-			regkey.SetValue("MinimizeOnVMStart", cbxMinimize.Checked, RegistryValueKind.DWord);
-			regkey.SetValue("ShowConsole", cbxShowConsole.Checked, RegistryValueKind.DWord);
-			regkey.SetValue("MinimizeToTray", cbxMinimizeTray.Checked, RegistryValueKind.DWord);
-			regkey.SetValue("CloseToTray", cbxCloseTray.Checked, RegistryValueKind.DWord);
-			regkey.SetValue("EnableLogging", cbxLogging.Checked, RegistryValueKind.DWord);
-			regkey.SetValue("LogPath", txtLogPath.Text, RegistryValueKind.String);
-			regkey.SetValue("EnableGridLines", cbxGrid.Checked, RegistryValueKind.DWord);
-			regkey.Close();
+			main.SettingsProvider.SaveSettings(newSettings);
 
 			settingsChanged = CheckForChanges();
 		}
@@ -177,70 +173,8 @@ public partial class dlgSettings : Form
 	//Read the settings from the registry
 	private void LoadSettings()
 	{
-		try
-		{
-			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", false); //Open the key as read only
-
-			//If the key doesn't exist yet, fallback to defaults
-			if (regkey == null)
-			{
-				MessageBox.Show("86Box Manager settings could not be loaded. This is normal if you're running 86Box Manager for the first time. Default values will be used.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-				//Create the key and reopen it for write access
-				regkey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
-				if (regkey == null)
-				{
-					throw new ArgumentNullException();
-				}
-				regkey.CreateSubKey("Virtual Machines");
-
-				txtCFGdir.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\86Box VMs\";
-				txtEXEdir.Text = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + @"\86Box\";
-				cbxMinimize.Checked = false;
-				cbxShowConsole.Checked = true;
-				cbxMinimizeTray.Checked = false;
-				cbxCloseTray.Checked = false;
-				cbxLogging.Checked = false;
-				txtLogPath.Text = "";
-				cbxGrid.Checked = false;
-				btnBrowse3.Enabled = false;
-				txtLogPath.Enabled = false;
-
-				SaveSettings(); //This will write the default values to the registry
-			}
-			else
-			{
-				txtEXEdir.Text = regkey.GetValue("EXEdir")?.ToString() ?? string.Empty;
-				txtCFGdir.Text = regkey.GetValue("CFGdir")?.ToString() ?? string.Empty;
-				txtLogPath.Text = regkey.GetValue("LogPath")?.ToString() ?? string.Empty;
-				cbxMinimize.Checked = Convert.ToBoolean(regkey.GetValue("MinimizeOnVMStart"));
-				cbxShowConsole.Checked = Convert.ToBoolean(regkey.GetValue("ShowConsole"));
-				cbxMinimizeTray.Checked = Convert.ToBoolean(regkey.GetValue("MinimizeToTray"));
-				cbxCloseTray.Checked = Convert.ToBoolean(regkey.GetValue("CloseToTray"));
-				cbxLogging.Checked = Convert.ToBoolean(regkey.GetValue("EnableLogging"));
-				cbxGrid.Checked = Convert.ToBoolean(regkey.GetValue("EnableGridLines"));
-				txtLogPath.Enabled = cbxLogging.Checked;
-				btnBrowse3.Enabled = cbxLogging.Checked;
-			}
-
-			regkey.Close();
-		}
-		catch (Exception)
-		{
-			MessageBox.Show("86Box Manager settings could not be loaded, because an error occured trying to load the registry keys and/or values. Make sure you have the required permissions and try again. Default values will be used now.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-			txtCFGdir.Text = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\86Box VMs";
-			txtEXEdir.Text = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + @"\86Box";
-			cbxMinimize.Checked = false;
-			cbxShowConsole.Checked = true;
-			cbxMinimizeTray.Checked = false;
-			cbxCloseTray.Checked = false;
-			cbxLogging.Checked = false;
-			txtLogPath.Text = "";
-			cbxGrid.Checked = false;
-			txtLogPath.Enabled = false;
-			btnBrowse3.Enabled = false;
-		}
+		SettingsValues currentSettings = main.SettingsProvider.SettingsValues;
+		PopulateBasedOnSettings(currentSettings);
 	}
 
 	private async void btnBrowse1_Click(object sender, EventArgs e)
@@ -254,10 +188,6 @@ public partial class dlgSettings : Form
 		if (await dialog.Show(Handle))
 		{
 			txtEXEdir.Text = dialog.FileName;
-			if (!txtEXEdir.Text.EndsWith('\\')) //Just in case
-			{
-				txtEXEdir.Text += @"\";
-			}
 		}
 	}
 
@@ -272,10 +202,6 @@ public partial class dlgSettings : Form
 		if (await dialog.Show(Handle))
 		{
 			txtCFGdir.Text = dialog.FileName;
-			if (!txtCFGdir.Text.EndsWith('\\')) //Just in case
-			{
-				txtCFGdir.Text += @"\";
-			}
 		}
 	}
 
@@ -291,29 +217,8 @@ public partial class dlgSettings : Form
 	//Resets the settings to their default values
 	private void ResetSettings()
 	{
-		RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
-		if (regkey == null)
-		{
-			regkey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
-			if (regkey == null)
-			{
-				throw new ArgumentNullException();
-			}
-			regkey.CreateSubKey("Virtual Machines");
-		}
-		regkey.Close();
-
-		txtCFGdir.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\86Box VMs\";
-		txtEXEdir.Text = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + @"\86Box\";
-		cbxMinimize.Checked = false;
-		cbxShowConsole.Checked = true;
-		cbxMinimizeTray.Checked = false;
-		cbxCloseTray.Checked = false;
-		cbxLogging.Checked = false;
-		txtLogPath.Text = "";
-		cbxGrid.Checked = false;
-		txtLogPath.Enabled = false;
-		btnBrowse3.Enabled = false;
+		SettingsValues defaultSettings = new();
+		PopulateBasedOnSettings(defaultSettings);
 
 		settingsChanged = CheckForChanges();
 	}
@@ -321,36 +226,20 @@ public partial class dlgSettings : Form
 	//Checks if all controls match the currently saved settings to determine if any changes were made
 	private bool CheckForChanges()
 	{
-		RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box");
-		if (regkey == null)
-		{
-			return true;
-		}
+		SettingsValues currentSettings = main.SettingsProvider.SettingsValues;
 
-		try
-		{
-			btnApply.Enabled = (
-				txtEXEdir.Text != regkey.GetValue("EXEdir")?.ToString() ||
-				txtCFGdir.Text != regkey.GetValue("CFGdir")?.ToString() ||
-				txtLogPath.Text != regkey.GetValue("LogPath")?.ToString() ||
-				cbxMinimize.Checked != Convert.ToBoolean(regkey.GetValue("MinimizeOnVMStart")) ||
-				cbxShowConsole.Checked != Convert.ToBoolean(regkey.GetValue("ShowConsole")) ||
-				cbxMinimizeTray.Checked != Convert.ToBoolean(regkey.GetValue("MinimizeToTray")) ||
-				cbxCloseTray.Checked != Convert.ToBoolean(regkey.GetValue("CloseToTray")) ||
-				cbxLogging.Checked != Convert.ToBoolean(regkey.GetValue("EnableLogging")) ||
-				cbxGrid.Checked != Convert.ToBoolean(regkey.GetValue("EnableGridLines")));
+		btnApply.Enabled = (
+			txtEXEdir.Text != currentSettings.BoxExePath ||
+			txtCFGdir.Text != currentSettings.VmPath ||
+			txtLogPath.Text != currentSettings.LogPath ||
+			cbxMinimize.Checked != currentSettings.MinimizeOnVMStart ||
+			cbxShowConsole.Checked != currentSettings.ShowConsole ||
+			cbxMinimizeTray.Checked != currentSettings.MinimizeToTray ||
+			cbxCloseTray.Checked != currentSettings.CloseToTray ||
+			cbxLogging.Checked != currentSettings.LoggingEnabled ||
+			cbxGrid.Checked != currentSettings.ShowGridLines);
 
-			return btnApply.Enabled;
-		}
-		catch (Exception ex)
-		{
-			MessageBox.Show("Error: " + ex.Message);
-			return true; //For now let's just return true if anything goes wrong
-		}
-		finally
-		{
-			regkey.Close();
-		}
+		return btnApply.Enabled;
 	}
 
 	private void cbx_CheckedChanged(object sender, EventArgs e)
@@ -394,5 +283,20 @@ public partial class dlgSettings : Form
 	{
 		lnkGithub.LinkVisited = true;
 		Process.Start("https://github.com/86Box/86BoxManager");
+	}
+
+	private void PopulateBasedOnSettings(SettingsValues currentSettings)
+	{
+		txtEXEdir.Text = currentSettings.BoxExePath;
+		txtCFGdir.Text = currentSettings.VmPath;
+		cbxLogging.Checked = currentSettings.LoggingEnabled;
+		txtLogPath.Text = currentSettings.LogPath;
+		cbxMinimize.Checked = currentSettings.MinimizeOnVMStart;
+		cbxShowConsole.Checked = currentSettings.ShowConsole;
+		cbxMinimizeTray.Checked = currentSettings.MinimizeToTray;
+		cbxCloseTray.Checked = currentSettings.CloseToTray;
+		cbxGrid.Checked = currentSettings.ShowGridLines;
+		txtLogPath.Enabled = cbxLogging.Checked;
+		btnBrowse3.Enabled = cbxLogging.Checked;
 	}
 }

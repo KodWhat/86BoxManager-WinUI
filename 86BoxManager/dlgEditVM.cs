@@ -67,8 +67,9 @@ public partial class dlgEditVM : Form
 		else
 		{
 			btnApply.Enabled = true;
-			lblPath1.Text = main.cfgpath + txtName.Text;
-			tipLblPath1.SetToolTip(lblPath1, main.cfgpath + txtName.Text);
+			string vmPath = Path.Combine(main.SettingsProvider.SettingsValues.VmPath, txtName.Text);
+			lblPath1.Text = vmPath;
+			tipLblPath1.SetToolTip(lblPath1, vmPath);
 		}
 	}
 }

@@ -44,7 +44,7 @@ public partial class dlgAddVM : Form
 
 	private void dlgAddVM_Load(object sender, EventArgs e)
 	{
-		lblPath1.Text = main.cfgpath;
+		lblPath1.Text = main.SettingsProvider.SettingsValues.VmPath;
 	}
 
 	private void txtName_TextChanged(object sender, EventArgs e)
@@ -66,8 +66,9 @@ public partial class dlgAddVM : Form
 			else
 			{
 				btnAdd.Enabled = true;
-				lblPath1.Text = main.cfgpath + txtName.Text;
-				tipLblPath1.SetToolTip(lblPath1, main.cfgpath + txtName.Text);
+				string vmPath = Path.Combine(main.SettingsProvider.SettingsValues.VmPath, txtName.Text);
+				lblPath1.Text = vmPath;
+				tipLblPath1.SetToolTip(lblPath1, vmPath);
 			}
 		}
 	}

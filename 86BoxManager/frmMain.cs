@@ -8,7 +8,11 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
 
+using EightySixBoxManager.Core.Settings;
+using EightySixBoxManager.Extensions;
 using EightySixBoxManager.Properties;
+
+using FluentResults;
 
 using IWshRuntimeLibrary;
 
@@ -34,20 +38,9 @@ public partial class frmMain : Form
 		public int cbData;
 		public IntPtr lpData;
 	}
-
-	//private static RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true); //Registry key for accessing the settings and VM list
-	public string exepath = ""; //Path to 86box.exe and the romset
-	public string cfgpath = ""; //Path to the virtual machines folder (configs, nvrs, etc.)
-	private bool minimize = false; //Minimize the main window when a VM is started?
-	private bool showConsole = true; //Show the console window when a VM is started?
-	private bool minimizeTray = false; //Minimize the Manager window to tray icon?
-	private bool closeTray = false; //Close the Manager Window to tray icon?
 	private string hWndHex = "";  //Window handle of this window  
-	private int sortColumn = 0; //The column for sorting
-	private SortOrder sortOrder = SortOrder.Ascending; //Sorting order
-	private bool logging = false; //Logging enabled for 86Box.exe (-L parameter)?
-	private string logpath = ""; //Path to log file
-	private bool gridlines = false; //Are grid lines enabled for VM list?
+
+	public ISettingsProvider SettingsProvider { get; } = new RegistrySettingsProvider();
 
 	public frmMain()
 	{
@@ -232,92 +225,9 @@ public partial class frmMain : Form
 	//Load the settings from the registry
 	private void LoadSettings()
 	{
-		try
-		{
-			//Try to load the settings from registry, if it fails fallback to default values
-			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
+		Result loadSettingsResult = SettingsProvider.LoadSettings();
 
-			if (regkey == null)
-			{
-				MessageBox.Show("86Box Manager settings could not be loaded. This is normal if you're running 86Box Manager for the first time. Default values will be used.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-				//Create the key and reopen it for write access
-				Registry.CurrentUser.CreateSubKey(@"SOFTWARE\86Box");
-				regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
-
-				if (regkey == null)
-				{
-					throw new ArgumentNullException();
-				}
-
-				regkey.CreateSubKey("Virtual Machines");
-
-				cfgpath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\86Box VMs\";
-				exepath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + @"\86Box\";
-				minimize = false;
-				showConsole = true;
-				minimizeTray = false;
-				closeTray = false;
-				logging = false;
-				logpath = "";
-				gridlines = false;
-				sortColumn = 0;
-				sortOrder = SortOrder.Ascending;
-
-				lstVMs.GridLines = false;
-				VMSort(sortColumn, sortOrder);
-
-				//Defaults must also be written to the registry
-				regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
-
-				if (regkey == null)
-				{
-					throw new ArgumentNullException();
-				}
-
-				regkey.SetValue("EXEdir", exepath, RegistryValueKind.String);
-				regkey.SetValue("CFGdir", cfgpath, RegistryValueKind.String);
-				regkey.SetValue("MinimizeOnVMStart", minimize, RegistryValueKind.DWord);
-				regkey.SetValue("ShowConsole", showConsole, RegistryValueKind.DWord);
-				regkey.SetValue("MinimizeToTray", minimizeTray, RegistryValueKind.DWord);
-				regkey.SetValue("CloseToTray", closeTray, RegistryValueKind.DWord);
-				regkey.SetValue("EnableLogging", logging, RegistryValueKind.DWord);
-				regkey.SetValue("LogPath", logpath, RegistryValueKind.String);
-				regkey.SetValue("EnableGridLines", gridlines, RegistryValueKind.DWord);
-				regkey.SetValue("SortColumn", sortColumn, RegistryValueKind.DWord);
-				regkey.SetValue("SortOrder", sortOrder, RegistryValueKind.DWord);
-			}
-			else
-			{
-				exepath = regkey.GetValue("EXEdir")?.ToString() ?? string.Empty;
-				cfgpath = regkey.GetValue("CFGdir")?.ToString() ?? string.Empty;
-				minimize = Convert.ToBoolean(regkey.GetValue("MinimizeOnVMStart"));
-				showConsole = Convert.ToBoolean(regkey.GetValue("ShowConsole"));
-				minimizeTray = Convert.ToBoolean(regkey.GetValue("MinimizeToTray"));
-				closeTray = Convert.ToBoolean(regkey.GetValue("CloseToTray"));
-				logpath = regkey.GetValue("LogPath")?.ToString() ?? string.Empty;
-				logging = Convert.ToBoolean(regkey.GetValue("EnableLogging"));
-				gridlines = Convert.ToBoolean(regkey.GetValue("EnableGridLines"));
-				sortColumn = (int)(regkey.GetValue("SortColumn") ?? 0);
-				sortOrder = (SortOrder)(regkey.GetValue("SortOrder") ?? 0);
-
-				lstVMs.GridLines = gridlines;
-				VMSort(sortColumn, sortOrder);
-			}
-
-			regkey.Close();
-
-			//To make sure there's a trailing backslash at the end, as other code using these strings expects it!
-			if (!exepath.EndsWith('\\'))
-			{
-				exepath += @"\";
-			}
-			if (!cfgpath.EndsWith('\\'))
-			{
-				cfgpath += @"\";
-			}
-		}
-		catch (Exception)
+		if (loadSettingsResult.IsFailed)
 		{
 			MessageBox.Show("An error occured trying to load the 86Box Manager registry keys and/or values. Make sure you have the required permissions and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			Application.Exit();
@@ -533,7 +443,7 @@ public partial class frmMain : Form
 		int vmCount = 0; //Number of running VMs
 
 		//Close to tray
-		if (e.CloseReason == CloseReason.UserClosing && closeTray)
+		if (e.CloseReason == CloseReason.UserClosing && SettingsProvider.SettingsValues.CloseToTray)
 		{
 			e.Cancel = true;
 			trayIcon.Visible = true;
@@ -639,7 +549,7 @@ public partial class frmMain : Form
 		pauseToolStripMenuItem.ToolTipText = "Resume this virtual machine";
 		toolTip.SetToolTip(btnPause, "Resume this virtual machine");
 
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 
@@ -666,7 +576,7 @@ public partial class frmMain : Form
 		toolTip.SetToolTip(btnStart, "Stop this virtual machine");
 		toolTip.SetToolTip(btnPause, "Pause this virtual machine");
 
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 
@@ -699,14 +609,14 @@ public partial class frmMain : Form
 			if (vm.Status == VM.STATUS_STOPPED)
 			{
 				Process p = new Process();
-				p.StartInfo.FileName = exepath + "86Box.exe";
+				p.StartInfo.FileName = Path.Combine(SettingsProvider.SettingsValues.BoxExePath, "86Box.exe");
 				p.StartInfo.Arguments = "--vmpath \"" + lstVMs.SelectedItems[0].SubItems[3].Text + "\" --hwnd " + idString + "," + hWndHex;
 
-				if (logging)
+				if (SettingsProvider.SettingsValues.LoggingEnabled)
 				{
-					p.StartInfo.Arguments += " --logfile \"" + logpath + "\"";
+					p.StartInfo.Arguments += " --logfile \"" + SettingsProvider.SettingsValues.LogPath + "\"";
 				}
-				if (!showConsole)
+				if (!SettingsProvider.SettingsValues.ShowConsole)
 				{
 					p.StartInfo.RedirectStandardOutput = true;
 					p.StartInfo.UseShellExecute = false;
@@ -719,7 +629,7 @@ public partial class frmMain : Form
 				lstVMs.SelectedItems[0].ImageIndex = 1;
 
 				//Minimize the main window if the user wants this
-				if (minimize)
+				if (SettingsProvider.SettingsValues.MinimizeOnVMStart)
 				{
 					WindowState = FormWindowState.Minimized;
 				}
@@ -761,7 +671,7 @@ public partial class frmMain : Form
 			MessageBox.Show("An error has occurred. Please provide the following information to the developer:\n" + ex.Message + "\n" + ex.StackTrace, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 
@@ -781,7 +691,7 @@ public partial class frmMain : Form
 			MessageBox.Show("An error occurred trying to stop the selected virtual machine.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 
@@ -802,7 +712,7 @@ public partial class frmMain : Form
 			MessageBox.Show("An error occurred trying to stop the selected virtual machine.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 
@@ -851,9 +761,9 @@ public partial class frmMain : Form
 			try
 			{
 				Process p = new Process();
-				p.StartInfo.FileName = exepath + "86Box.exe";
+				p.StartInfo.FileName = Path.Combine(SettingsProvider.SettingsValues.BoxExePath, "86Box.exe");
 				p.StartInfo.Arguments = "--settings --vmpath \"" + lstVMs.SelectedItems[0].SubItems[3].Text + "\"";
-				if (!showConsole)
+				if (!SettingsProvider.SettingsValues.ShowConsole)
 				{
 					p.StartInfo.RedirectStandardOutput = true;
 					p.StartInfo.UseShellExecute = false;
@@ -906,7 +816,7 @@ public partial class frmMain : Form
 			}
 		}
 
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 
@@ -981,7 +891,10 @@ public partial class frmMain : Form
 	//Creates a new VM from the data recieved and adds it to the listview
 	public void VMAdd(string name, string desc, bool openCFG, bool startVM)
 	{
-		VM newVM = new VM(name, desc, cfgpath + name);
+		string path = Path.Combine(SettingsProvider.SettingsValues.VmPath, name);
+
+		VM newVM = new VM(name, desc, path);
+
 		ListViewItem newLvi = new ListViewItem(newVM.Name)
 		{
 			Tag = newVM,
@@ -991,7 +904,7 @@ public partial class frmMain : Form
 		newLvi.SubItems.Add(new ListViewItem.ListViewSubItem(newLvi, newVM.Desc));
 		newLvi.SubItems.Add(new ListViewItem.ListViewSubItem(newLvi, newVM.Path));
 		lstVMs.Items.Add(newLvi);
-		Directory.CreateDirectory(cfgpath + newVM.Name);
+		Directory.CreateDirectory(path + newVM.Name);
 
 		using (var ms = new MemoryStream())
 		{
@@ -1027,7 +940,7 @@ public partial class frmMain : Form
 			VMConfigure();
 		}
 
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 
@@ -1069,7 +982,7 @@ public partial class frmMain : Form
 	}
 
 	//Changes a VM's name and/or description
-	public void VMEdit(string name, string desc)
+	public void VMEdit(string newName, string newDesc)
 	{
 		VM? vm = (VM?)lstVMs.SelectedItems[0].Tag;
 		if (vm == null)
@@ -1077,21 +990,24 @@ public partial class frmMain : Form
 			return;
 		}
 
-		string oldname = vm.Name;
-		if (!vm.Name.Equals(name))
+		string oldName = vm.Name;
+		if (!vm.Name.Equals(newName))
 		{
+			string oldPath = Path.Combine(SettingsProvider.SettingsValues.VmPath, vm.Name);
+			string newPath = Path.Combine(SettingsProvider.SettingsValues.VmPath, newName);
+
 			try
 			{ //Move the actual VM files too. This will invalidate any paths inside the cfg, but the user is informed to update those manually.
-				Directory.Move(cfgpath + vm.Name, cfgpath + name);
+				Directory.Move(oldPath, newPath);
 			}
 			catch (Exception)
 			{
 				MessageBox.Show("An error has occurred while trying to move the files for this virtual machine. Please try to move them manually.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
-			vm.Name = name;
-			vm.Path = cfgpath + vm.Name;
+			vm.Name = newName;
+			vm.Path = newPath;
 		}
-		vm.Desc = desc;
+		vm.Desc = newDesc;
 
 		//Create a new registry value with new info, delete the old one
 		RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
@@ -1102,7 +1018,7 @@ public partial class frmMain : Form
 
 		using (var ms = new MemoryStream())
 		{
-			regkey.DeleteValue(oldname);
+			regkey.DeleteValue(oldName);
 			var formatter = new BinaryFormatter();
 			formatter.Serialize(ms, vm);
 			var data = ms.ToArray();
@@ -1117,7 +1033,8 @@ public partial class frmMain : Form
 		regkey.Close();
 
 		MessageBox.Show("Virtual machine \"" + vm.Name + "\" was successfully modified. Please update its configuration so that any absolute paths (e.g. for hard disk images) point to the new folder.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-		VMSort(sortColumn, sortOrder);
+
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		LoadVMs();
 	}
 
@@ -1196,7 +1113,7 @@ public partial class frmMain : Form
 				}
 			}
 		}
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 
@@ -1612,7 +1529,7 @@ public partial class frmMain : Form
 	//Handles things when WindowState changes
 	private void frmMain_Resize(object sender, EventArgs e)
 	{
-		if (WindowState == FormWindowState.Minimized && minimizeTray)
+		if (WindowState == FormWindowState.Minimized && SettingsProvider.SettingsValues.MinimizeToTray)
 		{
 			trayIcon.Visible = true;
 			Hide();
@@ -1702,7 +1619,7 @@ public partial class frmMain : Form
 			}
 		}
 
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 
@@ -1722,10 +1639,12 @@ public partial class frmMain : Form
 			lstVMs.SelectedItems.Clear(); //Just in case so we don't end up with weird selection glitches
 		}
 
+		int previousSortColumn = SettingsProvider.SettingsValues.SortColumn;
+
 		//Remove the arrows from the current column text if they exist
-		if (sortColumn > -1 && (lstVMs.Columns[sortColumn].Text.EndsWith(ascArrow) || lstVMs.Columns[sortColumn].Text.EndsWith(descArrow)))
+		if (previousSortColumn > -1 && (lstVMs.Columns[previousSortColumn].Text.EndsWith(ascArrow) || lstVMs.Columns[previousSortColumn].Text.EndsWith(descArrow)))
 		{
-			lstVMs.Columns[sortColumn].Text = lstVMs.Columns[sortColumn].Text.Substring(0, lstVMs.Columns[sortColumn].Text.Length - 2);
+			lstVMs.Columns[previousSortColumn].Text = lstVMs.Columns[previousSortColumn].Text.Substring(0, lstVMs.Columns[previousSortColumn].Text.Length - 2);
 		}
 
 		//Then append the appropriate arrow to the new column text
@@ -1738,42 +1657,25 @@ public partial class frmMain : Form
 			lstVMs.Columns[column].Text += descArrow;
 		}
 
-		sortColumn = column;
-		sortOrder = order;
-		lstVMs.Sorting = sortOrder;
+		lstVMs.Sorting = order;
+		lstVMs.ListViewItemSorter = new ListViewItemComparer(column, lstVMs.Sorting);
+		Debug.WriteLine($"Sort | {column} {order}");
 		lstVMs.Sort();
-		lstVMs.ListViewItemSorter = new ListViewItemComparer(sortColumn, sortOrder);
-
-		//Save the new column and order to the registry
-		try
-		{
-			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
-
-			if (regkey == null)
-			{
-				return;
-			}
-
-			regkey.SetValue("SortColumn", sortColumn, RegistryValueKind.DWord);
-			regkey.SetValue("SortOrder", sortOrder, RegistryValueKind.DWord);
-			regkey.Close();
-		}
-		catch (Exception)
-		{
-			MessageBox.Show("Could not save the column sorting state to the registry. Make sure you have the required permissions and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-		}
 	}
 
 	//Handles the click event for the listview column headers, allowing to sort the items by columns
 	private void lstVMs_ColumnClick(object sender, ColumnClickEventArgs e)
 	{
-		if (lstVMs.Sorting == SortOrder.Ascending)
+		SortOrder newSortOrder = lstVMs.Sorting == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending;
+
+		VMSort(e.Column, newSortOrder);
+
+		// Save new sort settings
+		Result saveSortSettingsResult = SettingsProvider.SaveSortSettings(e.Column, newSortOrder.ToCoreSortOrder());
+
+		if (saveSortSettingsResult.IsFailed)
 		{
-			VMSort(e.Column, SortOrder.Descending);
-		}
-		else if (lstVMs.Sorting == SortOrder.Descending || lstVMs.Sorting == SortOrder.None)
-		{
-			VMSort(e.Column, SortOrder.Ascending);
+			MessageBox.Show("Could not save the column sorting state to the registry. Make sure you have the required permissions and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 	}
 
@@ -1819,7 +1721,9 @@ public partial class frmMain : Form
 	//Imports existing VM files to a new VM
 	public void VMImport(string name, string desc, string importPath, bool openCFG, bool startVM)
 	{
-		VM newVM = new VM(name, desc, cfgpath + name);
+		string newVmPath = Path.Combine(SettingsProvider.SettingsValues.VmPath, name);
+
+		VM newVM = new VM(name, desc, newVmPath);
 		ListViewItem newLvi = new ListViewItem(newVM.Name)
 		{
 			Tag = newVM,
@@ -1829,7 +1733,7 @@ public partial class frmMain : Form
 		newLvi.SubItems.Add(new ListViewItem.ListViewSubItem(newLvi, newVM.Desc));
 		newLvi.SubItems.Add(new ListViewItem.ListViewSubItem(newLvi, newVM.Path));
 		lstVMs.Items.Add(newLvi);
-		Directory.CreateDirectory(cfgpath + newVM.Name);
+		Directory.CreateDirectory(newVmPath);
 
 		bool importFailed = false;
 
@@ -1890,7 +1794,7 @@ public partial class frmMain : Form
 			VMConfigure();
 		}
 
-		VMSort(sortColumn, sortOrder);
+		VMSort(SettingsProvider.SettingsValues.SortColumn, SettingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
 		VMCountRefresh();
 	}
 

@@ -22,7 +22,7 @@ public partial class dlgCloneVM : Form
 
 	private void dlgCloneVM_Load(object sender, EventArgs e)
 	{
-		lblPath1.Text = main.cfgpath;
+		lblPath1.Text = main.SettingsProvider.SettingsValues.VmPath;
 		lblOldVM.Text = "Virtual machine \"" + Path.GetFileName(oldPath) + "\" will be cloned into:";
 	}
 
@@ -45,8 +45,9 @@ public partial class dlgCloneVM : Form
 			else
 			{
 				btnClone.Enabled = true;
-				lblPath1.Text = main.cfgpath + txtName.Text;
-				tipLblPath1.SetToolTip(lblPath1, main.cfgpath + txtName.Text);
+				string vmPath = Path.Combine(main.SettingsProvider.SettingsValues.VmPath, txtName.Text);
+				lblPath1.Text = vmPath;
+				tipLblPath1.SetToolTip(lblPath1, vmPath);
 			}
 		}
 	}

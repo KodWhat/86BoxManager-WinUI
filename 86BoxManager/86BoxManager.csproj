@@ -35,4 +35,7 @@
 		<PackageReference Include="System.Data.DataSetExtensions" />
 		<PackageReference Include="System.Runtime.Serialization.Formatters" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\86BoxManager.Core\86BoxManager.Core.csproj" />
+	</ItemGroup>
 </Project>
