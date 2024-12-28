@@ -31,14 +31,7 @@ public class FolderSelectDialog
 			return false;
 		}
 
-		//var result = VistaDialog.Show(hWndOwner, InitialDirectory, Title);
 		FileName = folder.Path;
 		return true;
-	}
-
-	private struct ShowDialogResult
-	{
-		public bool Result { get; set; }
-		public string FileName { get; set; }
 	}
 }
