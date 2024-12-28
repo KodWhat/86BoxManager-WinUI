@@ -1,9 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net9.0-windows</TargetFramework>
+		<TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+		<WindowsSdkPackageVersion>10.0.19041.57</WindowsSdkPackageVersion>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<WindowsPackageType>None</WindowsPackageType>
 		<OutputType>WinExe</OutputType>
 		<RootNamespace>EightySixBoxManager</RootNamespace>
-		<AssemblyName>86Manager</AssemblyName>
+		<AssemblyName>_86Manager</AssemblyName>
 		<MapFileExtensions>true</MapFileExtensions>
 		<ApplicationRevision>0</ApplicationRevision>
 		<ApplicationVersion>1.0.0.%2a</ApplicationVersion>
@@ -28,6 +31,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" />
 		<PackageReference Include="System.Data.DataSetExtensions" />
 		<PackageReference Include="System.Runtime.Serialization.Formatters" />
 	</ItemGroup>

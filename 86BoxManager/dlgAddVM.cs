@@ -72,7 +72,7 @@ public partial class dlgAddVM : Form
 		}
 	}
 
-	private void btnBrowse_Click(object sender, EventArgs e)
+	private async void btnBrowse_Click(object sender, EventArgs e)
 	{
 		FolderSelectDialog dialog = new FolderSelectDialog
 		{
@@ -80,7 +80,7 @@ public partial class dlgAddVM : Form
 			Title = "Select a folder where your virtual machines (configs, nvr folders, etc.) will be located"
 		};
 
-		if (dialog.Show(Handle))
+		if (await dialog.Show(Handle))
 		{
 			txtImportPath.Text = dialog.FileName;
 			txtName.Text = Path.GetFileName(dialog.FileName);

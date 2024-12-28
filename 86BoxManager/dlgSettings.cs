@@ -243,7 +243,7 @@ public partial class dlgSettings : Form
 		}
 	}
 
-	private void btnBrowse1_Click(object sender, EventArgs e)
+	private async void btnBrowse1_Click(object sender, EventArgs e)
 	{
 		FolderSelectDialog dialog = new FolderSelectDialog
 		{
@@ -251,7 +251,7 @@ public partial class dlgSettings : Form
 			Title = "Select a folder where 86Box program files and the roms folder are located"
 		};
 
-		if (dialog.Show(Handle))
+		if (await dialog.Show(Handle))
 		{
 			txtEXEdir.Text = dialog.FileName;
 			if (!txtEXEdir.Text.EndsWith('\\')) //Just in case
@@ -261,7 +261,7 @@ public partial class dlgSettings : Form
 		}
 	}
 
-	private void btnBrowse2_Click(object sender, EventArgs e)
+	private async void btnBrowse2_Click(object sender, EventArgs e)
 	{
 		FolderSelectDialog dialog = new FolderSelectDialog
 		{
@@ -269,7 +269,7 @@ public partial class dlgSettings : Form
 			Title = "Select a folder where your virtual machines (configs, nvr folders, etc.) will be located"
 		};
 
-		if (dialog.Show(Handle))
+		if (await dialog.Show(Handle))
 		{
 			txtCFGdir.Text = dialog.FileName;
 			if (!txtCFGdir.Text.EndsWith('\\')) //Just in case

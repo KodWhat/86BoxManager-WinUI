@@ -6,9 +6,9 @@ namespace EightySixBoxManager;
 
 public partial class dlgEditVM : Form
 {
-	private frmMain main = (frmMain)Application.OpenForms["frmMain"]; //Instance of frmMain
-	private VM vm = null; //VM to be edited
-	private string originalName; //Original name of the VM
+	private readonly frmMain main = (frmMain)Application.OpenForms["frmMain"]!; //Instance of frmMain
+	private VM? vm = null; //VM to be edited
+	private string originalName = string.Empty; //Original name of the VM
 
 	public dlgEditVM()
 	{
@@ -23,7 +23,11 @@ public partial class dlgEditVM : Form
 	//Load the data for selected VM
 	private void VMLoadData()
 	{
-		vm = (VM)main.lstVMs.FocusedItem.Tag;
+		vm = (VM?)main.lstVMs.FocusedItem?.Tag;
+		if (vm == null)
+		{
+			return;
+		}
 		originalName = vm.Name;
 		txtName.Text = vm.Name;
 		txtDesc.Text = vm.Desc;
