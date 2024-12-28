@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace _86boxManager.Properties {
+namespace EightySixBoxManager.Properties {
     using System;
     
     

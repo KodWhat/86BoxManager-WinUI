@@ -1,4 +1,4 @@
-﻿namespace _86boxManager
+﻿namespace EightySixBoxManager
 {
     partial class dlgAddVM
     {

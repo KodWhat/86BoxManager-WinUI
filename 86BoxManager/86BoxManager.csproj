@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net9.0-windows</TargetFramework>
 		<OutputType>WinExe</OutputType>
-		<RootNamespace>_86boxManager</RootNamespace>
+		<RootNamespace>EightySixBoxManager</RootNamespace>
 		<AssemblyName>86Manager</AssemblyName>
 		<MapFileExtensions>true</MapFileExtensions>
 		<ApplicationRevision>0</ApplicationRevision>
