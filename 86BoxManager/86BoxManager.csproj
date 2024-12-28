@@ -9,6 +9,8 @@
 		<ApplicationVersion>1.0.0.%2a</ApplicationVersion>
 		<UseWindowsForms>true</UseWindowsForms>
 		<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<PropertyGroup>
 		<ApplicationIcon>Resources\86Box-gray.ico</ApplicationIcon>
