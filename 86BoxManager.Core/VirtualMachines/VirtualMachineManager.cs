@@ -10,11 +10,11 @@ namespace EightySixBoxManager.Core.VirtualMachines;
 
 public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachineStorageProvider) : IVirtualMachineManager
 {
-	private readonly IVirtualMachineListingProvider _virtualMachineStorageProvider = virtualMachineStorageProvider;
+	private readonly IVirtualMachineListingProvider _virtualMachineListingProvider = virtualMachineStorageProvider;
 
 	public Result<IReadOnlyCollection<VirtualMachineInfo>> ListVirtualMachines()
 	{
-		return _virtualMachineStorageProvider.GetVirtualMachines();
+		return _virtualMachineListingProvider.GetVirtualMachines();
 	}
 
 	public Result<VirtualMachineInfo> CreateVirtualMachine(string name, string description)
@@ -23,10 +23,10 @@ public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachine
 		{
 			Name = name,
 			Description = description,
-			Path = _virtualMachineStorageProvider.ComputePath(name)
+			Path = _virtualMachineListingProvider.ComputePath(name)
 		};
 
-		Result addListingResult = _virtualMachineStorageProvider.AddVirtualMachine(virtualMachineInfo);
+		Result addListingResult = _virtualMachineListingProvider.AddVirtualMachine(virtualMachineInfo);
 
 		if (addListingResult.IsFailed)
 		{
@@ -50,9 +50,35 @@ public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachine
 		throw new System.NotImplementedException();
 	}
 
-	public Result DeleteVirtualMachine()
+	public Result DeleteVirtualMachine(VirtualMachineInfo virtualMachineInfo, bool deleteFiles)
 	{
-		throw new System.NotImplementedException();
+		if (virtualMachineInfo.Status is not VirtualMachineStatus.Stopped)
+		{
+			return Result.Fail("VM is not stopped");
+		}
+
+		Result removeResult = _virtualMachineListingProvider.RemoveVirtualMachine(virtualMachineInfo);
+
+		if (removeResult.IsFailed)
+		{
+			return Result.Fail("Failed to remove vm from listing");
+		}
+
+		if (deleteFiles is false)
+		{
+			return Result.Ok();
+		}
+
+		try
+		{
+			Directory.Delete(virtualMachineInfo.Path, true);
+
+			return Result.Ok();
+		}
+		catch (Exception ex)
+		{
+			return new ExceptionalError(ex);
+		}
 	}
 
 	public Result<VirtualMachineInfo> ImportVirtualMachine(string sourcePath, string name, string description)
@@ -61,10 +87,10 @@ public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachine
 		{
 			Name = name,
 			Description = description,
-			Path = _virtualMachineStorageProvider.ComputePath(name)
+			Path = _virtualMachineListingProvider.ComputePath(name)
 		};
 
-		Result addListingResult = _virtualMachineStorageProvider.AddVirtualMachine(virtualMachineInfo);
+		Result addListingResult = _virtualMachineListingProvider.AddVirtualMachine(virtualMachineInfo);
 
 		if (addListingResult.IsFailed)
 		{
@@ -118,6 +144,7 @@ public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachine
 	{
 		throw new System.NotImplementedException();
 	}
+
 	public Result ClearCmos(VirtualMachineInfo virtualMachineInfo)
 	{
 		try

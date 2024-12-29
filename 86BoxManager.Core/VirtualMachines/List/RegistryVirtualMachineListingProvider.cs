@@ -55,6 +55,8 @@ public class RegistryVirtualMachineListingProvider(ISettingsProvider settingsPro
 				});
 			}
 
+			regKey.Close();
+
 			return virtualMachineInfo;
 		}
 		catch (Exception ex)
@@ -93,6 +95,7 @@ public class RegistryVirtualMachineListingProvider(ISettingsProvider settingsPro
 			}
 
 			registryKey.SetValue(virtualMachineInfo.Name, data, RegistryValueKind.Binary);
+			registryKey.Close();
 
 			return Result.Ok();
 		}
@@ -106,5 +109,27 @@ public class RegistryVirtualMachineListingProvider(ISettingsProvider settingsPro
 	public string ComputePath(string vmName)
 	{
 		return Path.Combine(_settingsProvider.SettingsValues.VmPath, vmName);
+	}
+
+	public Result RemoveVirtualMachine(VirtualMachineInfo virtualMachineInfo)
+	{
+		try
+		{
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(VM_KEY, true);
+
+			if (regkey == null)
+			{
+				return Result.Fail($"Can't open or create registry key {VM_KEY}");
+			}
+
+			regkey.DeleteValue(virtualMachineInfo.Name);
+			regkey.Close();
+
+			return Result.Ok();
+		}
+		catch (Exception ex)
+		{
+			return new ExceptionalError(ex);
+		}
 	}
 }

@@ -11,4 +11,6 @@ public interface IVirtualMachineListingProvider
 	Result AddVirtualMachine(VirtualMachineInfo virtualMachineInfo);
 
 	string ComputePath(string vmName);
+
+	Result RemoveVirtualMachine(VirtualMachineInfo virtualMachineInfo);
 }

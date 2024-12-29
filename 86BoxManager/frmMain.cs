@@ -1073,59 +1073,41 @@ public partial class frmMain : Form
 				MessageBox.Show("Virtual machine \"" + vm.Name + "\" is currently running and cannot be removed. Please stop virtual machines before attempting to remove them.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				continue;
 			}
-			try
-			{
-				lstVMs.Items.Remove(lvi);
-				RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
 
-				if (regkey == null)
+			DialogResult alsoDeleteFilesResult = MessageBox.Show("Would you like to delete its files as well?", "Delete virtual machine files", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+			bool deleteFiles = alsoDeleteFilesResult == DialogResult.Yes;
+
+			Result deleteResult = _virtualMachineManager.DeleteVirtualMachine(vm, deleteFiles);
+
+			if (deleteResult.IsFailed)
+			{
+				if (deleteResult.HasException<UnauthorizedAccessException>())
 				{
-					return;
+					MessageBox.Show("86Box Manager was unable to delete the files of this virtual machine because they are read-only or you don't have sufficient privileges to delete them.\n\nMake sure the files are free for deletion, then remove them manually.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					continue;
 				}
+				else if (deleteResult.HasException<DirectoryNotFoundException>())
+				{
+					MessageBox.Show("86Box Manager was unable to delete the files of this virtual machine because they no longer exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					continue;
+				}
+				else if (deleteResult.HasException<IOException>())
+				{
+					MessageBox.Show("86Box Manager was unable to delete some files of this virtual machine because they are currently in use by another process.\n\nMake sure the files are free for deletion, then remove them manually.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					continue;
+				}
+				else
+				{
+					MessageBox.Show($"Virtual machine \"{vm.Name}\" could not be removed due to the following error:\n\n{deleteResult}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					continue;
+				}
+			}
 
-				regkey.DeleteValue(vm.Name);
-				regkey.Close();
-			}
-			catch (Exception ex) //Catches "regkey doesn't exist" exceptions and such
-			{
-				MessageBox.Show("Virtual machine \"" + vm.Name + "\" could not be removed due to the following error:\n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				continue;
-			}
-
-			DialogResult alsoDeleteFilesResult = MessageBox.Show("Virtual machine \"" + vm.Name + "\" was successfully removed. Would you like to delete its files as well?", "Virtual machine removed", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-			if (alsoDeleteFilesResult != DialogResult.Yes)
-			{
-				continue;
-			}
-
-			try
-			{
-				Directory.Delete(vm.Path, true);
-			}
-			catch (UnauthorizedAccessException) //Files are read-only or protected by privileges
-			{
-				MessageBox.Show("86Box Manager was unable to delete the files of this virtual machine because they are read-only or you don't have sufficient privileges to delete them.\n\nMake sure the files are free for deletion, then remove them manually.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				continue;
-			}
-			catch (DirectoryNotFoundException) //Directory not found
-			{
-				MessageBox.Show("86Box Manager was unable to delete the files of this virtual machine because they no longer exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				continue;
-			}
-			catch (IOException) //Files are in use by another process
-			{
-				MessageBox.Show("86Box Manager was unable to delete some files of this virtual machine because they are currently in use by another process.\n\nMake sure the files are free for deletion, then remove them manually.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				continue;
-			}
-			catch (Exception ex)
-			{ //Other exceptions
-				MessageBox.Show("The following error occurred while trying to remove the files of this virtual machine:\n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				continue;
-			}
-			MessageBox.Show("Files of virtual machine \"" + vm.Name + "\" were successfully deleted.", "Virtual machine files removed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			lstVMs.Items.Remove(lvi);
+			VMSort(_settingsProvider.SettingsValues.SortColumn, _settingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
+			VMCountRefresh();
+			MessageBox.Show($"Files of virtual machine \"{vm.Name}\" were successfully deleted.", "Virtual machine files removed", MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
-		VMSort(_settingsProvider.SettingsValues.SortColumn, _settingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
-		VMCountRefresh();
 	}
 
 	private void deleteToolStripMenuItem_Click(object sender, EventArgs e)

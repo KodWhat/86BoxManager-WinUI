@@ -12,7 +12,7 @@ public interface IVirtualMachineManager
 
 	Result EditVirtualMachine();
 
-	Result DeleteVirtualMachine();
+	Result DeleteVirtualMachine(VirtualMachineInfo virtualMachineInfo, bool deleteFiles);
 
 	Result<VirtualMachineInfo> ImportVirtualMachine(string sourcePath, string name, string description);
 
