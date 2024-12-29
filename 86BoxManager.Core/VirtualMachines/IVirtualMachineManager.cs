@@ -8,9 +8,9 @@ public interface IVirtualMachineManager
 {
 	Result<IReadOnlyCollection<VirtualMachineInfo>> ListVirtualMachines();
 
-	Result<VirtualMachineInfo> CreateVirtualMachine(string name, string description);
+	Result<VirtualMachineInfo> CreateVirtualMachine(string name, string description, bool createDirectory = true);
 
-	Result EditVirtualMachine();
+	Result<VirtualMachineInfo> EditVirtualMachine(VirtualMachineInfo virtualMachineInfo, string newName, string newDescription);
 
 	Result DeleteVirtualMachine(VirtualMachineInfo virtualMachineInfo, bool deleteFiles);
 

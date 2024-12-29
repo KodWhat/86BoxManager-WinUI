@@ -17,7 +17,7 @@ public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachine
 		return _virtualMachineListingProvider.GetVirtualMachines();
 	}
 
-	public Result<VirtualMachineInfo> CreateVirtualMachine(string name, string description)
+	public Result<VirtualMachineInfo> CreateVirtualMachine(string name, string description, bool createDirectory = true)
 	{
 		VirtualMachineInfo virtualMachineInfo = new()
 		{
@@ -33,21 +33,51 @@ public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachine
 			return addListingResult;
 		}
 
-		try
+		if (createDirectory)
 		{
-			Directory.CreateDirectory(virtualMachineInfo.Path);
-		}
-		catch (Exception ex)
-		{
-			return new ExceptionalError(ex);
+			try
+			{
+				Directory.CreateDirectory(virtualMachineInfo.Path);
+			}
+			catch (Exception ex)
+			{
+				return new ExceptionalError(ex);
+			}
 		}
 
 		return virtualMachineInfo;
 	}
 
-	public Result EditVirtualMachine()
+	public Result<VirtualMachineInfo> EditVirtualMachine(VirtualMachineInfo virtualMachineInfo, string newName, string newDescription)
 	{
-		throw new System.NotImplementedException();
+		Result deleteResult = DeleteVirtualMachine(virtualMachineInfo, deleteFiles: false);
+
+		if (deleteResult.IsFailed)
+		{
+			return Result.Fail($"Error while removing existing entry for vm {virtualMachineInfo.Name}");
+		}
+
+		Result<VirtualMachineInfo> createResult = CreateVirtualMachine(newName, newDescription, false);
+
+		if (createResult.IsFailed)
+		{
+			return Result.Fail($"Error while creating entry for vm {newName}");
+		}
+
+		if (virtualMachineInfo.Name == newName)
+		{
+			return createResult.Value;
+		}
+
+		try
+		{ //Move the actual VM files too. This will invalidate any paths inside the cfg, but the user is informed to update those manually.
+			Directory.Move(virtualMachineInfo.Path, createResult.Value.Path);
+			return createResult.Value;
+		}
+		catch (Exception ex)
+		{
+			return new ExceptionalError(ex);
+		}
 	}
 
 	public Result DeleteVirtualMachine(VirtualMachineInfo virtualMachineInfo, bool deleteFiles)

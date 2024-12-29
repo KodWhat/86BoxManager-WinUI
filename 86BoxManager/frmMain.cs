@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -922,6 +921,24 @@ public partial class frmMain : Form
 
 		VirtualMachineInfo newVm = newVmResult.Value;
 
+		CreateListEntry(newVm);
+
+		//Start the VM and/or open settings window if the user chose this option
+		if (startVM)
+		{
+			VMStart();
+		}
+		if (openCFG)
+		{
+			VMConfigure();
+		}
+
+		VMSort(_settingsProvider.SettingsValues.SortColumn, _settingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
+		VMCountRefresh();
+	}
+
+	private void CreateListEntry(VirtualMachineInfo newVm)
+	{
 		ListViewItem newLvi = new ListViewItem(newVm.Name)
 		{
 			Tag = newVm,
@@ -939,19 +956,6 @@ public partial class frmMain : Form
 		}
 		newLvi.Focused = true;
 		newLvi.Selected = true;
-
-		//Start the VM and/or open settings window if the user chose this option
-		if (startVM)
-		{
-			VMStart();
-		}
-		if (openCFG)
-		{
-			VMConfigure();
-		}
-
-		VMSort(_settingsProvider.SettingsValues.SortColumn, _settingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
-		VMCountRefresh();
 	}
 
 	//Checks if a VM with this name already exists
@@ -994,56 +998,26 @@ public partial class frmMain : Form
 	//Changes a VM's name and/or description
 	public void VMEdit(string newName, string newDesc)
 	{
-		if (lstVMs.SelectedItems[0].Tag is not VirtualMachineInfo vm)
+		ListViewItem lvi = lstVMs.SelectedItems[0];
+
+		if (lvi.Tag is not VirtualMachineInfo vm)
 		{
 			return;
 		}
 
-		string oldName = vm.Name;
-		if (!vm.Name.Equals(newName))
-		{
-			string oldPath = vm.Path;
-			string newPath = Path.Combine(_settingsProvider.SettingsValues.VmPath, newName);
+		Result<VirtualMachineInfo> editResult = _virtualMachineManager.EditVirtualMachine(vm, newName, newDesc);
 
-			try
-			{ //Move the actual VM files too. This will invalidate any paths inside the cfg, but the user is informed to update those manually.
-				Directory.Move(oldPath, newPath);
-			}
-			catch (Exception)
-			{
-				MessageBox.Show("An error has occurred while trying to move the files for this virtual machine. Please try to move them manually.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			}
-			vm.Name = newName;
-		}
-		vm.Description = newDesc;
-
-		//Create a new registry value with new info, delete the old one
-		RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
-		if (regkey == null)
+		if (editResult.IsSuccess)
 		{
+			MessageBox.Show("Virtual machine \"" + vm.Name + "\" was successfully modified. Please update its configuration so that any absolute paths (e.g. for hard disk images) point to the new folder.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+			VMSort(_settingsProvider.SettingsValues.SortColumn, _settingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
+			LoadVMs();
+
 			return;
 		}
 
-		using (var ms = new MemoryStream())
-		{
-			regkey.DeleteValue(oldName);
-			var formatter = new BinaryFormatter();
-			formatter.Serialize(ms, vm);
-			var data = ms.ToArray();
-			regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
-			if (regkey == null)
-			{
-				return;
-			}
-
-			regkey.SetValue(vm.Name, data, RegistryValueKind.Binary);
-		}
-		regkey.Close();
-
-		MessageBox.Show("Virtual machine \"" + vm.Name + "\" was successfully modified. Please update its configuration so that any absolute paths (e.g. for hard disk images) point to the new folder.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-		VMSort(_settingsProvider.SettingsValues.SortColumn, _settingsProvider.SettingsValues.SortOrder.ToWinFormsSortOrder());
-		LoadVMs();
+		MessageBox.Show("An error has occurred while trying to edit this virtual machine. Please check virtual machine files and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 	}
 
 	private void btnDelete_Click(object sender, EventArgs e)
