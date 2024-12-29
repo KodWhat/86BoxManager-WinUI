@@ -1464,19 +1464,19 @@ public partial class frmMain : Form
 			try
 			{
 				WshShell shell = new WshShell();
-				string shortcutAddress = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\" + vm.Name + ".lnk";
+				string shortcutAddress = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), $"{vm.Name}.lnk");
 				IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
 				shortcut.Description = vm.Description;
-				shortcut.IconLocation = Application.StartupPath + @"\86manager.exe,0";
-				shortcut.TargetPath = Application.StartupPath + @"\86manager.exe";
-				shortcut.Arguments = "-S \"" + vm.Name + "\"";
+				shortcut.IconLocation = $"{Application.ExecutablePath},0";
+				shortcut.TargetPath = Application.ExecutablePath;
+				shortcut.Arguments = $"-S \"{vm.Name}\"";
 				shortcut.Save();
 
-				MessageBox.Show("A desktop shortcut for the virtual machine \"" + vm.Name + "\" was successfully created.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				MessageBox.Show($"A desktop shortcut for the virtual machine \"{vm.Name}\" was successfully created.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 			}
 			catch (Exception)
 			{
-				MessageBox.Show("A desktop shortcut for the virtual machine \"" + vm.Name + "\" could not be created.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show($"A desktop shortcut for the virtual machine \"{vm.Name}\" could not be created.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 	}
