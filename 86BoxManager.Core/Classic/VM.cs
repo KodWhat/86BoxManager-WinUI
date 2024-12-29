@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace EightySixBoxManager;
+namespace EightySixBoxManager.Core.Classic;
 
 [Serializable] //For serializing VMs so they can be stored in the registry
-public class VM
+internal class VM
 {
-	public IntPtr hWnd { get; set; } //Window handle for the VM once it's started
+	public nint hWnd { get; set; } //Window handle for the VM once it's started
 	public string Name { get; set; } //Name of the virtual machine
 	public string Desc { get; set; } //Description
 	public string Path { get; set; } //Path to config, nvr, etc.
@@ -22,7 +22,7 @@ public class VM
 		Desc = "defaultDesc";
 		Path = "defaultPath";
 		Status = STATUS_STOPPED;
-		hWnd = IntPtr.Zero;
+		hWnd = nint.Zero;
 	}
 
 	public VM(string name, string desc, string path)
@@ -31,7 +31,7 @@ public class VM
 		Desc = desc;
 		Path = path;
 		Status = STATUS_STOPPED;
-		hWnd = IntPtr.Zero;
+		hWnd = nint.Zero;
 	}
 
 	public override string ToString()

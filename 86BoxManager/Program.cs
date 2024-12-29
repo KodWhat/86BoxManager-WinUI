@@ -4,6 +4,13 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
+using EightySixBoxManager.Core.Settings;
+using EightySixBoxManager.Core.VirtualMachines;
+using EightySixBoxManager.Core.VirtualMachines.List;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
 namespace EightySixBoxManager;
 
 static class Program
@@ -50,6 +57,8 @@ static class Program
 
 	private static readonly string AppID = "86Box.86Box"; //For grouping windows together in Win7+ taskbar
 	private static Mutex mutex = null;
+
+	public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
 	[STAThread]
 	static void Main()
@@ -101,7 +110,29 @@ static class Program
 			}
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new frmMain());
+
+			IHost host = CreateHostBuilder().Build();
+			ServiceProvider = host.Services;
+
+			Application.Run(ServiceProvider.GetRequiredService<frmMain>());
 		}
+	}
+
+	static IHostBuilder CreateHostBuilder()
+	{
+		return Host
+			.CreateDefaultBuilder()
+			.ConfigureServices((context, services) =>
+			{
+				services.AddTransient<frmMain>();
+				services.AddTransient<dlgSettings>();
+				services.AddTransient<dlgAddVM>();
+				services.AddTransient<dlgEditVM>();
+				services.AddTransient<dlgCloneVM>();
+
+				services.AddSingleton<ISettingsProvider, RegistrySettingsProvider>();
+				services.AddSingleton<IVirtualMachineListingProvider, RegistryVirtualMachineListingProvider>();
+				services.AddSingleton<IVirtualMachineManager, VirtualMachineManager>();
+			});
 	}
 }

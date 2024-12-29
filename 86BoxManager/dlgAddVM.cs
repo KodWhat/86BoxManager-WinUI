@@ -2,15 +2,20 @@
 using System.IO;
 using System.Windows.Forms;
 
+using EightySixBoxManager.Core.Settings;
+
 namespace EightySixBoxManager;
 
 public partial class dlgAddVM : Form
 {
+	private readonly ISettingsProvider _settingsProvider;
+
 	private readonly frmMain main = (frmMain)Application.OpenForms["frmMain"]!; //Instance of frmMain
 	private bool existingVM = false; //Is this importing an existing VM or not
 
-	public dlgAddVM()
+	public dlgAddVM(ISettingsProvider settingsProvider)
 	{
+		_settingsProvider = settingsProvider;
 		InitializeComponent();
 	}
 
@@ -44,7 +49,7 @@ public partial class dlgAddVM : Form
 
 	private void dlgAddVM_Load(object sender, EventArgs e)
 	{
-		lblPath1.Text = main.SettingsProvider.SettingsValues.VmPath;
+		lblPath1.Text = _settingsProvider.SettingsValues.VmPath;
 	}
 
 	private void txtName_TextChanged(object sender, EventArgs e)
@@ -66,7 +71,7 @@ public partial class dlgAddVM : Form
 			else
 			{
 				btnAdd.Enabled = true;
-				string vmPath = Path.Combine(main.SettingsProvider.SettingsValues.VmPath, txtName.Text);
+				string vmPath = Path.Combine(_settingsProvider.SettingsValues.VmPath, txtName.Text);
 				lblPath1.Text = vmPath;
 				tipLblPath1.SetToolTip(lblPath1, vmPath);
 			}

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace EightySixBoxManager;
-internal class ClassicSerializationBinder : SerializationBinder
+namespace EightySixBoxManager.Core.Classic;
+
+public class ClassicSerializationBinder : SerializationBinder
 {
 	public override Type? BindToType(string assemblyName, string typeName)
 	{

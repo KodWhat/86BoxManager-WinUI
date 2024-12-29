@@ -2,16 +2,21 @@
 using System.IO;
 using System.Windows.Forms;
 
+using EightySixBoxManager.Core.Settings;
+using EightySixBoxManager.Core.VirtualMachines;
+
 namespace EightySixBoxManager;
 
 public partial class dlgEditVM : Form
 {
+	private readonly ISettingsProvider _settingsProvider;
+
 	private readonly frmMain main = (frmMain)Application.OpenForms["frmMain"]!; //Instance of frmMain
-	private VM? vm = null; //VM to be edited
 	private string originalName = string.Empty; //Original name of the VM
 
-	public dlgEditVM()
+	public dlgEditVM(ISettingsProvider settingsProvider)
 	{
+		_settingsProvider = settingsProvider;
 		InitializeComponent();
 	}
 
@@ -23,14 +28,14 @@ public partial class dlgEditVM : Form
 	//Load the data for selected VM
 	private void VMLoadData()
 	{
-		vm = (VM?)main.lstVMs.FocusedItem?.Tag;
-		if (vm == null)
+		if (main.lstVMs.FocusedItem?.Tag is not VirtualMachineInfo vm)
 		{
 			return;
 		}
+
 		originalName = vm.Name;
 		txtName.Text = vm.Name;
-		txtDesc.Text = vm.Desc;
+		txtDesc.Text = vm.Description;
 		lblPath1.Text = vm.Path;
 	}
 
@@ -67,7 +72,7 @@ public partial class dlgEditVM : Form
 		else
 		{
 			btnApply.Enabled = true;
-			string vmPath = Path.Combine(main.SettingsProvider.SettingsValues.VmPath, txtName.Text);
+			string vmPath = Path.Combine(_settingsProvider.SettingsValues.VmPath, txtName.Text);
 			lblPath1.Text = vmPath;
 			tipLblPath1.SetToolTip(lblPath1, vmPath);
 		}

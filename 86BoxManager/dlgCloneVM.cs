@@ -1,29 +1,32 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
+
+using EightySixBoxManager.Core.Settings;
 
 namespace EightySixBoxManager;
 
 public partial class dlgCloneVM : Form
 {
-	private readonly string oldPath = string.Empty; //Path of the VM to be cloned
+	private readonly ISettingsProvider _settingsProvider;
+
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public string OldPath { get; set; } = string.Empty; //Path of the VM to be cloned
+
 	private readonly frmMain main = (frmMain)Application.OpenForms["frmMain"]!; //Instance of frmMain
 
-	public dlgCloneVM()
+	public dlgCloneVM(ISettingsProvider settingsProvider)
 	{
-		InitializeComponent();
-	}
+		_settingsProvider = settingsProvider;
 
-	public dlgCloneVM(string oldPath)
-	{
 		InitializeComponent();
-		this.oldPath = oldPath;
 	}
 
 	private void dlgCloneVM_Load(object sender, EventArgs e)
 	{
-		lblPath1.Text = main.SettingsProvider.SettingsValues.VmPath;
-		lblOldVM.Text = "Virtual machine \"" + Path.GetFileName(oldPath) + "\" will be cloned into:";
+		lblPath1.Text = _settingsProvider.SettingsValues.VmPath;
+		lblOldVM.Text = "Virtual machine \"" + Path.GetFileName(OldPath) + "\" will be cloned into:";
 	}
 
 	private void txtName_TextChanged(object sender, EventArgs e)
@@ -45,7 +48,7 @@ public partial class dlgCloneVM : Form
 			else
 			{
 				btnClone.Enabled = true;
-				string vmPath = Path.Combine(main.SettingsProvider.SettingsValues.VmPath, txtName.Text);
+				string vmPath = Path.Combine(_settingsProvider.SettingsValues.VmPath, txtName.Text);
 				lblPath1.Text = vmPath;
 				tipLblPath1.SetToolTip(lblPath1, vmPath);
 			}
@@ -66,7 +69,7 @@ public partial class dlgCloneVM : Form
 		}
 
 		//Just import stuff from the existing VM
-		main.VMImport(txtName.Text, txtDescription.Text, oldPath, cbxOpenCFG.Checked, cbxStartVM.Checked);
+		main.VMImport(txtName.Text, txtDescription.Text, OldPath, cbxOpenCFG.Checked, cbxStartVM.Checked);
 		Close();
 	}
 }
