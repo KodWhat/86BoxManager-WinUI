@@ -279,13 +279,21 @@ public partial class dlgSettings : Form
 	private void lnkGithub2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 	{
 		lnkGithub2.LinkVisited = true;
-		Process.Start("https://github.com/86Box/86Box");
+		ProcessStartInfo startInfo = new("https://github.com/86Box/86Box")
+		{
+			UseShellExecute = true
+		};
+		Process.Start(startInfo);
 	}
 
 	private void lnkGithub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 	{
 		lnkGithub.LinkVisited = true;
-		Process.Start("https://github.com/86Box/86BoxManager");
+		ProcessStartInfo startInfo = new("https://github.com/86Box/86BoxManager")
+		{
+			UseShellExecute = true
+		};
+		Process.Start(startInfo);
 	}
 
 	private void PopulateBasedOnSettings(SettingsValues currentSettings)

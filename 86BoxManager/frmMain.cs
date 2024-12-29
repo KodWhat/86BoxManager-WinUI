@@ -1439,7 +1439,11 @@ public partial class frmMain : Form
 
 			try
 			{
-				Process.Start(vm.Path);
+				ProcessStartInfo startInfo = new(vm.Path)
+				{
+					UseShellExecute = true
+				};
+				Process.Start(startInfo);
 			}
 			catch (Exception)
 			{
@@ -1853,7 +1857,11 @@ public partial class frmMain : Form
 			}
 			try
 			{
-				Process.Start(Path.Combine(_settingsProvider.SettingsValues.VmPath, vm.Name, "86box.cfg"));
+				ProcessStartInfo startInfo = new(vm.Path, "86box.cfg")
+				{
+					UseShellExecute = true
+				};
+				Process.Start(startInfo);
 			}
 			catch (Exception)
 			{
