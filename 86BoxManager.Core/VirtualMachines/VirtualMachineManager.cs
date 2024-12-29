@@ -94,11 +94,6 @@ public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachine
 		return virtualMachineInfo;
 	}
 
-	public Result CloneVirtualMachine()
-	{
-		throw new System.NotImplementedException();
-	}
-
 	public Result StartVirtualMachine()
 	{
 		throw new System.NotImplementedException();
@@ -122,5 +117,17 @@ public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachine
 	public Result ResumeVirtualMachine()
 	{
 		throw new System.NotImplementedException();
+	}
+	public Result ClearCmos(VirtualMachineInfo virtualMachineInfo)
+	{
+		try
+		{
+			Directory.Delete(Path.Combine(virtualMachineInfo.Path, "nvr"), true);
+			return Result.Ok();
+		}
+		catch (Exception ex)
+		{
+			return new ExceptionalError(ex);
+		}
 	}
 }

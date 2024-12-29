@@ -1708,11 +1708,11 @@ public partial class frmMain : Form
 
 	private void wipeToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		VMWipe();
+		VMClearCMOS();
 	}
 
-	//Deletes the config and nvr of selected VM
-	private void VMWipe()
+	//Deletes the nvr of selected VMs
+	private void VMClearCMOS()
 	{
 		foreach (ListViewItem lvi in lstVMs.SelectedItems)
 		{
@@ -1721,7 +1721,9 @@ public partial class frmMain : Form
 				continue;
 			}
 
-			DialogResult = MessageBox.Show("Wiping a virtual machine deletes its configuration and nvr files. You'll have to reconfigure the virtual machine (and the BIOS if applicable).\n\n Are you sure you wish to wipe the virtual machine \"" + vm.Name + "\"?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+			DialogResult = MessageBox.Show($"Clearing the CMOS will delete BIOS configuration (nvr files). This is effectively like removing the battery on a real motherboard. You'll have to reconfigure the BIOS.\n\n" +
+				$"Are you sure you want to clear the CMOS of virtual machine \"{vm.Name}\"?", "Warning",
+				MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 			if (DialogResult != DialogResult.Yes)
 			{
 				continue;
@@ -1729,18 +1731,17 @@ public partial class frmMain : Form
 
 			if (vm.Status is not VirtualMachineStatus.Stopped)
 			{
-				MessageBox.Show("The virtual machine \"" + vm.Name + "\" is currently running and cannot be wiped. Please stop virtual machines before attempting to wipe them.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show("The virtual machine \"" + vm.Name + "\" is currently running and cannot has its CMOS cleared. Please stop virtual machines before attempting to clear CMOS.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				continue;
 			}
 			try
 			{
-				System.IO.File.Delete(Path.Combine(_settingsProvider.SettingsValues.VmPath, vm.Name, "86box.cfg"));
-				Directory.Delete(Path.Combine(_settingsProvider.SettingsValues.VmPath, vm.Name, "nvr"), true);
-				MessageBox.Show("The virtual machine \"" + vm.Name + "\" was successfully wiped.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				_virtualMachineManager.ClearCmos(vm);
+				MessageBox.Show("The CMOS for virtual machine \"" + vm.Name + "\" was successfully cleared.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 			}
 			catch (Exception)
 			{
-				MessageBox.Show("An error occurred trying to wipe the virtual machine \"" + vm.Name + "\".", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show("An error occurred trying to clear CMOS for the virtual machine \"" + vm.Name + "\".", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				continue;
 			}
 		}

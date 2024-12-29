@@ -20,505 +20,479 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+		#region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-            this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
-            this.btnEdit = new System.Windows.Forms.Button();
-            this.btnDelete = new System.Windows.Forms.Button();
-            this.btnStart = new System.Windows.Forms.Button();
-            this.lstVMs = new System.Windows.Forms.ListView();
-            this.clmName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmDesc = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cmsVM = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resetCTRLALTDELETEToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.hardResetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.wipeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cloneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openConfigFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createADesktopShortcutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.img86box = new System.Windows.Forms.ImageList(this.components);
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.btnConfigure = new System.Windows.Forms.Button();
-            this.imgStatus = new System.Windows.Forms.ImageList(this.components);
-            this.btnPause = new System.Windows.Forms.Button();
-            this.btnCtrlAltDel = new System.Windows.Forms.Button();
-            this.btnReset = new System.Windows.Forms.Button();
-            this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.cmsTrayIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.open86BoxManagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.statusBar = new System.Windows.Forms.StatusStrip();
-            this.lblVMCount = new System.Windows.Forms.ToolStripStatusLabel();
-            this.btnSettings = new System.Windows.Forms.Button();
-            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.cmsVM.SuspendLayout();
-            this.cmsTrayIcon.SuspendLayout();
-            this.statusBar.SuspendLayout();
-            this.SuspendLayout();
-            //
-            // btnEdit
-            //
-            this.btnEdit.Enabled = false;
-            this.btnEdit.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnEdit.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnEdit.Location = new System.Drawing.Point(72, 15);
-            this.btnEdit.Margin = new System.Windows.Forms.Padding(4);
-            this.btnEdit.Name = "btnEdit";
-            this.btnEdit.Size = new System.Drawing.Size(56, 38);
-            this.btnEdit.TabIndex = 1;
-            this.btnEdit.Text = "Edit";
-            this.toolTip.SetToolTip(this.btnEdit, "Edit the properties of this virtual machine");
-            this.btnEdit.UseVisualStyleBackColor = true;
-            this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
-            //
-            // btnDelete
-            //
-            this.btnDelete.Enabled = false;
-            this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnDelete.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnDelete.Location = new System.Drawing.Point(136, 15);
-            this.btnDelete.Margin = new System.Windows.Forms.Padding(4);
-            this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(75, 38);
-            this.btnDelete.TabIndex = 2;
-            this.btnDelete.Text = "Remove";
-            this.toolTip.SetToolTip(this.btnDelete, "Remove this virtual machine");
-            this.btnDelete.UseVisualStyleBackColor = true;
-            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
-            //
-            // btnStart
-            //
-            this.btnStart.Enabled = false;
-            this.btnStart.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnStart.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnStart.Location = new System.Drawing.Point(246, 15);
-            this.btnStart.Margin = new System.Windows.Forms.Padding(4);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(56, 38);
-            this.btnStart.TabIndex = 3;
-            this.btnStart.Text = "Start";
-            this.toolTip.SetToolTip(this.btnStart, "Start this virtual machine");
-            this.btnStart.UseVisualStyleBackColor = true;
-            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
-            //
-            // lstVMs
-            //
-            this.lstVMs.AllowColumnReorder = true;
-            this.lstVMs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstVMs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.clmName,
-            this.clmStatus,
-            this.clmDesc,
-            this.clmPath});
-            this.lstVMs.ContextMenuStrip = this.cmsVM;
-            this.lstVMs.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lstVMs.FullRowSelect = true;
-            this.lstVMs.HideSelection = false;
-            this.lstVMs.Location = new System.Drawing.Point(15, 60);
-            this.lstVMs.Margin = new System.Windows.Forms.Padding(4);
-            this.lstVMs.Name = "lstVMs";
-            this.lstVMs.ShowGroups = false;
-            this.lstVMs.ShowItemToolTips = true;
-            this.lstVMs.Size = new System.Drawing.Size(824, 515);
-            this.lstVMs.SmallImageList = this.img86box;
-            this.lstVMs.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.lstVMs.TabIndex = 10;
-            this.lstVMs.UseCompatibleStateImageBehavior = false;
-            this.lstVMs.View = System.Windows.Forms.View.Details;
-            this.lstVMs.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lstVMs_ColumnClick);
-            this.lstVMs.SelectedIndexChanged += new System.EventHandler(this.lstVMs_SelectedIndexChanged);
-            this.lstVMs.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lstVMs_KeyDown);
-            this.lstVMs.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lstVMs_MouseDoubleClick);
-            //
-            // clmName
-            //
-            this.clmName.Text = "Name";
-            this.clmName.Width = 184;
-            //
-            // clmStatus
-            //
-            this.clmStatus.Text = "Status";
-            this.clmStatus.Width = 107;
-            //
-            // clmDesc
-            //
-            this.clmDesc.Text = "Description";
-            this.clmDesc.Width = 144;
-            //
-            // clmPath
-            //
-            this.clmPath.Text = "Path";
-            this.clmPath.Width = 217;
-            //
-            // cmsVM
-            //
-            this.cmsVM.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.cmsVM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.startToolStripMenuItem,
-            this.configureToolStripMenuItem,
-            this.pauseToolStripMenuItem,
-            this.resetCTRLALTDELETEToolStripMenuItem,
-            this.hardResetToolStripMenuItem,
-            this.toolStripSeparator3,
-            this.killToolStripMenuItem,
-            this.wipeToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.editToolStripMenuItem,
-            this.cloneToolStripMenuItem,
-            this.deleteToolStripMenuItem,
-            this.openFolderToolStripMenuItem,
-            this.openConfigFileToolStripMenuItem,
-            this.createADesktopShortcutToolStripMenuItem});
-            this.cmsVM.Name = "cmsVM";
-            this.cmsVM.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.cmsVM.Size = new System.Drawing.Size(248, 328);
-            this.cmsVM.Opening += new System.ComponentModel.CancelEventHandler(this.cmsVM_Opening);
-            //
-            // startToolStripMenuItem
-            //
-            this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.startToolStripMenuItem.Text = "Start";
-            this.startToolStripMenuItem.ToolTipText = "Start this virtual machine";
-            this.startToolStripMenuItem.Click += new System.EventHandler(this.startToolStripMenuItem_Click);
-            //
-            // configureToolStripMenuItem
-            //
-            this.configureToolStripMenuItem.Name = "configureToolStripMenuItem";
-            this.configureToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.configureToolStripMenuItem.Text = "Configure";
-            this.configureToolStripMenuItem.ToolTipText = "Change configuration for this virtual machine";
-            this.configureToolStripMenuItem.Click += new System.EventHandler(this.configureToolStripMenuItem_Click);
-            //
-            // pauseToolStripMenuItem
-            //
-            this.pauseToolStripMenuItem.Name = "pauseToolStripMenuItem";
-            this.pauseToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.pauseToolStripMenuItem.Text = "Pause";
-            this.pauseToolStripMenuItem.ToolTipText = "Pause this virtual machine";
-            this.pauseToolStripMenuItem.Click += new System.EventHandler(this.pauseToolStripMenuItem_Click);
-            //
-            // resetCTRLALTDELETEToolStripMenuItem
-            //
-            this.resetCTRLALTDELETEToolStripMenuItem.Name = "resetCTRLALTDELETEToolStripMenuItem";
-            this.resetCTRLALTDELETEToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.resetCTRLALTDELETEToolStripMenuItem.Text = "Send CTRL+ALT+DEL";
-            this.resetCTRLALTDELETEToolStripMenuItem.ToolTipText = "Send the CTRL+ALT+DEL keystroke to this virtual machine";
-            this.resetCTRLALTDELETEToolStripMenuItem.Click += new System.EventHandler(this.resetCTRLALTDELETEToolStripMenuItem_Click);
-            //
-            // hardResetToolStripMenuItem
-            //
-            this.hardResetToolStripMenuItem.Name = "hardResetToolStripMenuItem";
-            this.hardResetToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.hardResetToolStripMenuItem.Text = "Hard reset";
-            this.hardResetToolStripMenuItem.ToolTipText = "Reset this virtual machine by simulating a power cycle";
-            this.hardResetToolStripMenuItem.Click += new System.EventHandler(this.hardResetToolStripMenuItem_Click);
-            //
-            // toolStripSeparator3
-            //
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(244, 6);
-            //
-            // killToolStripMenuItem
-            //
-            this.killToolStripMenuItem.Name = "killToolStripMenuItem";
-            this.killToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.killToolStripMenuItem.Text = "Kill";
-            this.killToolStripMenuItem.ToolTipText = "Kill this virtual machine";
-            this.killToolStripMenuItem.Click += new System.EventHandler(this.killToolStripMenuItem_Click);
-            //
-            // wipeToolStripMenuItem
-            //
-            this.wipeToolStripMenuItem.Name = "wipeToolStripMenuItem";
-            this.wipeToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.wipeToolStripMenuItem.Text = "Wipe";
-            this.wipeToolStripMenuItem.ToolTipText = "Delete configuration and nvr for this virtual machine";
-            this.wipeToolStripMenuItem.Click += new System.EventHandler(this.wipeToolStripMenuItem_Click);
-            //
-            // toolStripSeparator1
-            //
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(244, 6);
-            //
-            // editToolStripMenuItem
-            //
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.editToolStripMenuItem.Text = "Edit";
-            this.editToolStripMenuItem.ToolTipText = "Edit the properties of this virtual machine";
-            this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
-            //
-            // cloneToolStripMenuItem
-            //
-            this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
-            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.cloneToolStripMenuItem.Text = "Clone";
-            this.cloneToolStripMenuItem.ToolTipText = "Clone this virtual machine";
-            this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
-            //
-            // deleteToolStripMenuItem
-            //
-            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.deleteToolStripMenuItem.Text = "Remove";
-            this.deleteToolStripMenuItem.ToolTipText = "Remove this virtual machine";
-            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
-            //
-            // openFolderToolStripMenuItem
-            //
-            this.openFolderToolStripMenuItem.Name = "openFolderToolStripMenuItem";
-            this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.openFolderToolStripMenuItem.Text = "Open folder in Explorer";
-            this.openFolderToolStripMenuItem.ToolTipText = "Open the folder for this virtual machine in Windows Explorer";
-            this.openFolderToolStripMenuItem.Click += new System.EventHandler(this.openFolderToolStripMenuItem_Click);
-            //
-            // openConfigFileToolStripMenuItem
-            //
-            this.openConfigFileToolStripMenuItem.Name = "openConfigFileToolStripMenuItem";
-            this.openConfigFileToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.openConfigFileToolStripMenuItem.Text = "Open config file";
-            this.openConfigFileToolStripMenuItem.ToolTipText = "Open the config file for this virtual machine";
-            this.openConfigFileToolStripMenuItem.Click += new System.EventHandler(this.openConfigFileToolStripMenuItem_Click);
-            //
-            // createADesktopShortcutToolStripMenuItem
-            //
-            this.createADesktopShortcutToolStripMenuItem.Name = "createADesktopShortcutToolStripMenuItem";
-            this.createADesktopShortcutToolStripMenuItem.Size = new System.Drawing.Size(247, 24);
-            this.createADesktopShortcutToolStripMenuItem.Text = "Create a desktop shortcut";
-            this.createADesktopShortcutToolStripMenuItem.ToolTipText = "Create a shortcut for this virtual machine on the desktop";
-            this.createADesktopShortcutToolStripMenuItem.Click += new System.EventHandler(this.createADesktopShortcutToolStripMenuItem_Click);
-            //
-            // img86box
-            //
-            this.img86box.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("img86box.ImageStream")));
-            this.img86box.TransparentColor = System.Drawing.Color.Transparent;
-            this.img86box.Images.SetKeyName(0, "status_stopped.png");
-            this.img86box.Images.SetKeyName(1, "status_running.png");
-            this.img86box.Images.SetKeyName(2, "status_paused.png");
-            //
-            // btnAdd
-            //
-            this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnAdd.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnAdd.Location = new System.Drawing.Point(15, 15);
-            this.btnAdd.Margin = new System.Windows.Forms.Padding(4);
-            this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(50, 38);
-            this.btnAdd.TabIndex = 0;
-            this.btnAdd.Text = "Add";
-            this.toolTip.SetToolTip(this.btnAdd, "Add a new or an existing virtual machine");
-            this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
-            //
-            // btnConfigure
-            //
-            this.btnConfigure.Enabled = false;
-            this.btnConfigure.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnConfigure.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnConfigure.Location = new System.Drawing.Point(310, 15);
-            this.btnConfigure.Margin = new System.Windows.Forms.Padding(4);
-            this.btnConfigure.Name = "btnConfigure";
-            this.btnConfigure.Size = new System.Drawing.Size(88, 38);
-            this.btnConfigure.TabIndex = 4;
-            this.btnConfigure.Text = "Configure";
-            this.toolTip.SetToolTip(this.btnConfigure, "Change the configuration of this virtual machine");
-            this.btnConfigure.UseVisualStyleBackColor = true;
-            this.btnConfigure.Click += new System.EventHandler(this.btnConfigure_Click);
-            //
-            // imgStatus
-            //
-            this.imgStatus.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-            this.imgStatus.ImageSize = new System.Drawing.Size(16, 16);
-            this.imgStatus.TransparentColor = System.Drawing.Color.Transparent;
-            //
-            // btnPause
-            //
-            this.btnPause.Enabled = false;
-            this.btnPause.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnPause.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnPause.Location = new System.Drawing.Point(405, 15);
-            this.btnPause.Margin = new System.Windows.Forms.Padding(4);
-            this.btnPause.Name = "btnPause";
-            this.btnPause.Size = new System.Drawing.Size(69, 38);
-            this.btnPause.TabIndex = 5;
-            this.btnPause.Text = "Pause";
-            this.toolTip.SetToolTip(this.btnPause, "Pause this virtual machine");
-            this.btnPause.UseVisualStyleBackColor = true;
-            this.btnPause.Click += new System.EventHandler(this.btnPause_Click);
-            //
-            // btnCtrlAltDel
-            //
-            this.btnCtrlAltDel.Enabled = false;
-            this.btnCtrlAltDel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnCtrlAltDel.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnCtrlAltDel.Location = new System.Drawing.Point(481, 15);
-            this.btnCtrlAltDel.Margin = new System.Windows.Forms.Padding(4);
-            this.btnCtrlAltDel.Name = "btnCtrlAltDel";
-            this.btnCtrlAltDel.Size = new System.Drawing.Size(75, 38);
-            this.btnCtrlAltDel.TabIndex = 6;
-            this.btnCtrlAltDel.Text = "C+A+D";
-            this.toolTip.SetToolTip(this.btnCtrlAltDel, "Send the CTRL+ALT+DEL keystroke to this virtual machine");
-            this.btnCtrlAltDel.UseVisualStyleBackColor = true;
-            this.btnCtrlAltDel.Click += new System.EventHandler(this.btnCtrlAltDel_Click);
-            //
-            // btnReset
-            //
-            this.btnReset.Enabled = false;
-            this.btnReset.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnReset.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnReset.Location = new System.Drawing.Point(564, 15);
-            this.btnReset.Margin = new System.Windows.Forms.Padding(4);
-            this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(62, 38);
-            this.btnReset.TabIndex = 7;
-            this.btnReset.Text = "Reset";
-            this.toolTip.SetToolTip(this.btnReset, "Reset this virtual machine by simulating a power cycle");
-            this.btnReset.UseVisualStyleBackColor = true;
-            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
-            //
-            // trayIcon
-            //
-            this.trayIcon.ContextMenuStrip = this.cmsTrayIcon;
-            this.trayIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("trayIcon.Icon")));
-            this.trayIcon.Text = "86Box Manager";
-            this.trayIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.trayIcon_MouseDoubleClick);
-            //
-            // cmsTrayIcon
-            //
-            this.cmsTrayIcon.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.cmsTrayIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.open86BoxManagerToolStripMenuItem,
-            this.settingsToolStripMenuItem,
-            this.toolStripSeparator2,
-            this.exitToolStripMenuItem});
-            this.cmsTrayIcon.Name = "cmsVM";
-            this.cmsTrayIcon.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.cmsTrayIcon.Size = new System.Drawing.Size(223, 82);
-            //
-            // open86BoxManagerToolStripMenuItem
-            //
-            this.open86BoxManagerToolStripMenuItem.Name = "open86BoxManagerToolStripMenuItem";
-            this.open86BoxManagerToolStripMenuItem.Size = new System.Drawing.Size(222, 24);
-            this.open86BoxManagerToolStripMenuItem.Text = "Show 86Box Manager";
-            this.open86BoxManagerToolStripMenuItem.ToolTipText = "Restore the 86Box Manager window";
-            this.open86BoxManagerToolStripMenuItem.Click += new System.EventHandler(this.open86BoxManagerToolStripMenuItem_Click);
-            //
-            // settingsToolStripMenuItem
-            //
-            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(222, 24);
-            this.settingsToolStripMenuItem.Text = "Settings";
-            this.settingsToolStripMenuItem.ToolTipText = "Open 86Box Manager settings";
-            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
-            //
-            // toolStripSeparator2
-            //
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(219, 6);
-            //
-            // exitToolStripMenuItem
-            //
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(222, 24);
-            this.exitToolStripMenuItem.Text = "Exit";
-            this.exitToolStripMenuItem.ToolTipText = "Close 86Box Manager";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
-            //
-            // statusBar
-            //
-            this.statusBar.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.lblVMCount});
-            this.statusBar.Location = new System.Drawing.Point(0, 593);
-            this.statusBar.Name = "statusBar";
-            this.statusBar.Padding = new System.Windows.Forms.Padding(1, 0, 18, 0);
-            this.statusBar.Size = new System.Drawing.Size(855, 26);
-            this.statusBar.TabIndex = 11;
-            this.statusBar.Text = "statusStrip1";
-            //
-            // lblVMCount
-            //
-            this.lblVMCount.BackColor = System.Drawing.Color.Transparent;
-            this.lblVMCount.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.lblVMCount.Name = "lblVMCount";
-            this.lblVMCount.Size = new System.Drawing.Size(150, 20);
-            this.lblVMCount.Text = "# of virtual machines:";
-            //
-            // btnSettings
-            //
-            this.btnSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSettings.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnSettings.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnSettings.Location = new System.Drawing.Point(759, 15);
-            this.btnSettings.Margin = new System.Windows.Forms.Padding(4);
-            this.btnSettings.Name = "btnSettings";
-            this.btnSettings.Size = new System.Drawing.Size(81, 38);
-            this.btnSettings.TabIndex = 8;
-            this.btnSettings.Text = "Settings";
-            this.toolTip.SetToolTip(this.btnSettings, "Open 86Box Manager settings");
-            this.btnSettings.UseVisualStyleBackColor = true;
-            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
-            //
-            // frmMain
-            //
-            this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(855, 619);
-            this.Controls.Add(this.statusBar);
-            this.Controls.Add(this.btnReset);
-            this.Controls.Add(this.btnCtrlAltDel);
-            this.Controls.Add(this.btnPause);
-            this.Controls.Add(this.btnConfigure);
-            this.Controls.Add(this.btnAdd);
-            this.Controls.Add(this.lstVMs);
-            this.Controls.Add(this.btnSettings);
-            this.Controls.Add(this.btnStart);
-            this.Controls.Add(this.btnDelete);
-            this.Controls.Add(this.btnEdit);
-            this.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(5);
-            this.MinimumSize = new System.Drawing.Size(870, 613);
-            this.Name = "frmMain";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "86Box Manager";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
-            this.Load += new System.EventHandler(this.frmMain_Load);
-            this.Resize += new System.EventHandler(this.frmMain_Resize);
-            this.cmsVM.ResumeLayout(false);
-            this.cmsTrayIcon.ResumeLayout(false);
-            this.statusBar.ResumeLayout(false);
-            this.statusBar.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+		/// <summary>
+		/// Required method for Designer support - do not modify
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
+			btnEdit = new System.Windows.Forms.Button();
+			btnDelete = new System.Windows.Forms.Button();
+			btnStart = new System.Windows.Forms.Button();
+			lstVMs = new System.Windows.Forms.ListView();
+			clmName = new System.Windows.Forms.ColumnHeader();
+			clmStatus = new System.Windows.Forms.ColumnHeader();
+			clmDesc = new System.Windows.Forms.ColumnHeader();
+			clmPath = new System.Windows.Forms.ColumnHeader();
+			cmsVM = new System.Windows.Forms.ContextMenuStrip(components);
+			startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			pauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			resetCTRLALTDELETEToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			hardResetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+			killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			wipeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			cloneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			openFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			openConfigFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			createADesktopShortcutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			img86box = new System.Windows.Forms.ImageList(components);
+			btnAdd = new System.Windows.Forms.Button();
+			btnConfigure = new System.Windows.Forms.Button();
+			imgStatus = new System.Windows.Forms.ImageList(components);
+			btnPause = new System.Windows.Forms.Button();
+			btnCtrlAltDel = new System.Windows.Forms.Button();
+			btnReset = new System.Windows.Forms.Button();
+			trayIcon = new System.Windows.Forms.NotifyIcon(components);
+			cmsTrayIcon = new System.Windows.Forms.ContextMenuStrip(components);
+			open86BoxManagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			statusBar = new System.Windows.Forms.StatusStrip();
+			lblVMCount = new System.Windows.Forms.ToolStripStatusLabel();
+			btnSettings = new System.Windows.Forms.Button();
+			toolTip = new System.Windows.Forms.ToolTip(components);
+			cmsVM.SuspendLayout();
+			cmsTrayIcon.SuspendLayout();
+			statusBar.SuspendLayout();
+			SuspendLayout();
+			// 
+			// btnEdit
+			// 
+			btnEdit.Enabled = false;
+			btnEdit.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			btnEdit.Font = new System.Drawing.Font("Segoe UI", 10F);
+			btnEdit.Location = new System.Drawing.Point(72, 15);
+			btnEdit.Margin = new System.Windows.Forms.Padding(4);
+			btnEdit.Name = "btnEdit";
+			btnEdit.Size = new System.Drawing.Size(56, 38);
+			btnEdit.TabIndex = 1;
+			btnEdit.Text = "Edit";
+			toolTip.SetToolTip(btnEdit, "Edit the properties of this virtual machine");
+			btnEdit.UseVisualStyleBackColor = true;
+			btnEdit.Click += btnEdit_Click;
+			// 
+			// btnDelete
+			// 
+			btnDelete.Enabled = false;
+			btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			btnDelete.Font = new System.Drawing.Font("Segoe UI", 10F);
+			btnDelete.Location = new System.Drawing.Point(136, 15);
+			btnDelete.Margin = new System.Windows.Forms.Padding(4);
+			btnDelete.Name = "btnDelete";
+			btnDelete.Size = new System.Drawing.Size(75, 38);
+			btnDelete.TabIndex = 2;
+			btnDelete.Text = "Remove";
+			toolTip.SetToolTip(btnDelete, "Remove this virtual machine");
+			btnDelete.UseVisualStyleBackColor = true;
+			btnDelete.Click += btnDelete_Click;
+			// 
+			// btnStart
+			// 
+			btnStart.Enabled = false;
+			btnStart.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			btnStart.Font = new System.Drawing.Font("Segoe UI", 10F);
+			btnStart.Location = new System.Drawing.Point(246, 15);
+			btnStart.Margin = new System.Windows.Forms.Padding(4);
+			btnStart.Name = "btnStart";
+			btnStart.Size = new System.Drawing.Size(56, 38);
+			btnStart.TabIndex = 3;
+			btnStart.Text = "Start";
+			toolTip.SetToolTip(btnStart, "Start this virtual machine");
+			btnStart.UseVisualStyleBackColor = true;
+			btnStart.Click += btnStart_Click;
+			// 
+			// lstVMs
+			// 
+			lstVMs.AllowColumnReorder = true;
+			lstVMs.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+			lstVMs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { clmName, clmStatus, clmDesc, clmPath });
+			lstVMs.ContextMenuStrip = cmsVM;
+			lstVMs.Font = new System.Drawing.Font("Segoe UI", 10F);
+			lstVMs.FullRowSelect = true;
+			lstVMs.Location = new System.Drawing.Point(15, 60);
+			lstVMs.Margin = new System.Windows.Forms.Padding(4);
+			lstVMs.Name = "lstVMs";
+			lstVMs.ShowGroups = false;
+			lstVMs.ShowItemToolTips = true;
+			lstVMs.Size = new System.Drawing.Size(824, 515);
+			lstVMs.SmallImageList = img86box;
+			lstVMs.Sorting = System.Windows.Forms.SortOrder.Ascending;
+			lstVMs.TabIndex = 10;
+			lstVMs.UseCompatibleStateImageBehavior = false;
+			lstVMs.View = System.Windows.Forms.View.Details;
+			lstVMs.ColumnClick += lstVMs_ColumnClick;
+			lstVMs.SelectedIndexChanged += lstVMs_SelectedIndexChanged;
+			lstVMs.KeyDown += lstVMs_KeyDown;
+			lstVMs.MouseDoubleClick += lstVMs_MouseDoubleClick;
+			// 
+			// clmName
+			// 
+			clmName.Text = "Name";
+			clmName.Width = 184;
+			// 
+			// clmStatus
+			// 
+			clmStatus.Text = "Status";
+			clmStatus.Width = 107;
+			// 
+			// clmDesc
+			// 
+			clmDesc.Text = "Description";
+			clmDesc.Width = 144;
+			// 
+			// clmPath
+			// 
+			clmPath.Text = "Path";
+			clmPath.Width = 217;
+			// 
+			// cmsVM
+			// 
+			cmsVM.ImageScalingSize = new System.Drawing.Size(20, 20);
+			cmsVM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { startToolStripMenuItem, configureToolStripMenuItem, pauseToolStripMenuItem, resetCTRLALTDELETEToolStripMenuItem, hardResetToolStripMenuItem, toolStripSeparator3, killToolStripMenuItem, wipeToolStripMenuItem, toolStripSeparator1, editToolStripMenuItem, cloneToolStripMenuItem, deleteToolStripMenuItem, openFolderToolStripMenuItem, openConfigFileToolStripMenuItem, createADesktopShortcutToolStripMenuItem });
+			cmsVM.Name = "cmsVM";
+			cmsVM.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+			cmsVM.Size = new System.Drawing.Size(210, 324);
+			cmsVM.Opening += cmsVM_Opening;
+			// 
+			// startToolStripMenuItem
+			// 
+			startToolStripMenuItem.Name = "startToolStripMenuItem";
+			startToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			startToolStripMenuItem.Text = "Start";
+			startToolStripMenuItem.ToolTipText = "Start this virtual machine";
+			startToolStripMenuItem.Click += startToolStripMenuItem_Click;
+			// 
+			// configureToolStripMenuItem
+			// 
+			configureToolStripMenuItem.Name = "configureToolStripMenuItem";
+			configureToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			configureToolStripMenuItem.Text = "Configure";
+			configureToolStripMenuItem.ToolTipText = "Change configuration for this virtual machine";
+			configureToolStripMenuItem.Click += configureToolStripMenuItem_Click;
+			// 
+			// pauseToolStripMenuItem
+			// 
+			pauseToolStripMenuItem.Name = "pauseToolStripMenuItem";
+			pauseToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			pauseToolStripMenuItem.Text = "Pause";
+			pauseToolStripMenuItem.ToolTipText = "Pause this virtual machine";
+			pauseToolStripMenuItem.Click += pauseToolStripMenuItem_Click;
+			// 
+			// resetCTRLALTDELETEToolStripMenuItem
+			// 
+			resetCTRLALTDELETEToolStripMenuItem.Name = "resetCTRLALTDELETEToolStripMenuItem";
+			resetCTRLALTDELETEToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			resetCTRLALTDELETEToolStripMenuItem.Text = "Send CTRL+ALT+DEL";
+			resetCTRLALTDELETEToolStripMenuItem.ToolTipText = "Send the CTRL+ALT+DEL keystroke to this virtual machine";
+			resetCTRLALTDELETEToolStripMenuItem.Click += resetCTRLALTDELETEToolStripMenuItem_Click;
+			// 
+			// hardResetToolStripMenuItem
+			// 
+			hardResetToolStripMenuItem.Name = "hardResetToolStripMenuItem";
+			hardResetToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			hardResetToolStripMenuItem.Text = "Hard reset";
+			hardResetToolStripMenuItem.ToolTipText = "Reset this virtual machine by simulating a power cycle";
+			hardResetToolStripMenuItem.Click += hardResetToolStripMenuItem_Click;
+			// 
+			// toolStripSeparator3
+			// 
+			toolStripSeparator3.Name = "toolStripSeparator3";
+			toolStripSeparator3.Size = new System.Drawing.Size(206, 6);
+			// 
+			// killToolStripMenuItem
+			// 
+			killToolStripMenuItem.Name = "killToolStripMenuItem";
+			killToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			killToolStripMenuItem.Text = "Kill";
+			killToolStripMenuItem.ToolTipText = "Kill this virtual machine";
+			killToolStripMenuItem.Click += killToolStripMenuItem_Click;
+			// 
+			// wipeToolStripMenuItem
+			// 
+			wipeToolStripMenuItem.Name = "wipeToolStripMenuItem";
+			wipeToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			wipeToolStripMenuItem.Text = "Clear CMOS";
+			wipeToolStripMenuItem.ToolTipText = "Delete nvr for this virtual machine";
+			wipeToolStripMenuItem.Click += wipeToolStripMenuItem_Click;
+			// 
+			// toolStripSeparator1
+			// 
+			toolStripSeparator1.Name = "toolStripSeparator1";
+			toolStripSeparator1.Size = new System.Drawing.Size(206, 6);
+			// 
+			// editToolStripMenuItem
+			// 
+			editToolStripMenuItem.Name = "editToolStripMenuItem";
+			editToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			editToolStripMenuItem.Text = "Edit";
+			editToolStripMenuItem.ToolTipText = "Edit the properties of this virtual machine";
+			editToolStripMenuItem.Click += editToolStripMenuItem_Click;
+			// 
+			// cloneToolStripMenuItem
+			// 
+			cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
+			cloneToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			cloneToolStripMenuItem.Text = "Clone";
+			cloneToolStripMenuItem.ToolTipText = "Clone this virtual machine";
+			cloneToolStripMenuItem.Click += cloneToolStripMenuItem_Click;
+			// 
+			// deleteToolStripMenuItem
+			// 
+			deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+			deleteToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			deleteToolStripMenuItem.Text = "Remove";
+			deleteToolStripMenuItem.ToolTipText = "Remove this virtual machine";
+			deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
+			// 
+			// openFolderToolStripMenuItem
+			// 
+			openFolderToolStripMenuItem.Name = "openFolderToolStripMenuItem";
+			openFolderToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			openFolderToolStripMenuItem.Text = "Open folder in Explorer";
+			openFolderToolStripMenuItem.ToolTipText = "Open the folder for this virtual machine in Windows Explorer";
+			openFolderToolStripMenuItem.Click += openFolderToolStripMenuItem_Click;
+			// 
+			// openConfigFileToolStripMenuItem
+			// 
+			openConfigFileToolStripMenuItem.Name = "openConfigFileToolStripMenuItem";
+			openConfigFileToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			openConfigFileToolStripMenuItem.Text = "Open config file";
+			openConfigFileToolStripMenuItem.ToolTipText = "Open the config file for this virtual machine";
+			openConfigFileToolStripMenuItem.Click += openConfigFileToolStripMenuItem_Click;
+			// 
+			// createADesktopShortcutToolStripMenuItem
+			// 
+			createADesktopShortcutToolStripMenuItem.Name = "createADesktopShortcutToolStripMenuItem";
+			createADesktopShortcutToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+			createADesktopShortcutToolStripMenuItem.Text = "Create a desktop shortcut";
+			createADesktopShortcutToolStripMenuItem.ToolTipText = "Create a shortcut for this virtual machine on the desktop";
+			createADesktopShortcutToolStripMenuItem.Click += createADesktopShortcutToolStripMenuItem_Click;
+			// 
+			// img86box
+			// 
+			img86box.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+			img86box.ImageStream = (System.Windows.Forms.ImageListStreamer)resources.GetObject("img86box.ImageStream");
+			img86box.TransparentColor = System.Drawing.Color.Transparent;
+			img86box.Images.SetKeyName(0, "status_stopped.png");
+			img86box.Images.SetKeyName(1, "status_running.png");
+			img86box.Images.SetKeyName(2, "status_paused.png");
+			// 
+			// btnAdd
+			// 
+			btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			btnAdd.Font = new System.Drawing.Font("Segoe UI", 10F);
+			btnAdd.Location = new System.Drawing.Point(15, 15);
+			btnAdd.Margin = new System.Windows.Forms.Padding(4);
+			btnAdd.Name = "btnAdd";
+			btnAdd.Size = new System.Drawing.Size(50, 38);
+			btnAdd.TabIndex = 0;
+			btnAdd.Text = "Add";
+			toolTip.SetToolTip(btnAdd, "Add a new or an existing virtual machine");
+			btnAdd.UseVisualStyleBackColor = true;
+			btnAdd.Click += btnAdd_Click;
+			// 
+			// btnConfigure
+			// 
+			btnConfigure.Enabled = false;
+			btnConfigure.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			btnConfigure.Font = new System.Drawing.Font("Segoe UI", 10F);
+			btnConfigure.Location = new System.Drawing.Point(310, 15);
+			btnConfigure.Margin = new System.Windows.Forms.Padding(4);
+			btnConfigure.Name = "btnConfigure";
+			btnConfigure.Size = new System.Drawing.Size(88, 38);
+			btnConfigure.TabIndex = 4;
+			btnConfigure.Text = "Configure";
+			toolTip.SetToolTip(btnConfigure, "Change the configuration of this virtual machine");
+			btnConfigure.UseVisualStyleBackColor = true;
+			btnConfigure.Click += btnConfigure_Click;
+			// 
+			// imgStatus
+			// 
+			imgStatus.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+			imgStatus.ImageSize = new System.Drawing.Size(16, 16);
+			imgStatus.TransparentColor = System.Drawing.Color.Transparent;
+			// 
+			// btnPause
+			// 
+			btnPause.Enabled = false;
+			btnPause.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			btnPause.Font = new System.Drawing.Font("Segoe UI", 10F);
+			btnPause.Location = new System.Drawing.Point(405, 15);
+			btnPause.Margin = new System.Windows.Forms.Padding(4);
+			btnPause.Name = "btnPause";
+			btnPause.Size = new System.Drawing.Size(69, 38);
+			btnPause.TabIndex = 5;
+			btnPause.Text = "Pause";
+			toolTip.SetToolTip(btnPause, "Pause this virtual machine");
+			btnPause.UseVisualStyleBackColor = true;
+			btnPause.Click += btnPause_Click;
+			// 
+			// btnCtrlAltDel
+			// 
+			btnCtrlAltDel.Enabled = false;
+			btnCtrlAltDel.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			btnCtrlAltDel.Font = new System.Drawing.Font("Segoe UI", 10F);
+			btnCtrlAltDel.Location = new System.Drawing.Point(481, 15);
+			btnCtrlAltDel.Margin = new System.Windows.Forms.Padding(4);
+			btnCtrlAltDel.Name = "btnCtrlAltDel";
+			btnCtrlAltDel.Size = new System.Drawing.Size(75, 38);
+			btnCtrlAltDel.TabIndex = 6;
+			btnCtrlAltDel.Text = "C+A+D";
+			toolTip.SetToolTip(btnCtrlAltDel, "Send the CTRL+ALT+DEL keystroke to this virtual machine");
+			btnCtrlAltDel.UseVisualStyleBackColor = true;
+			btnCtrlAltDel.Click += btnCtrlAltDel_Click;
+			// 
+			// btnReset
+			// 
+			btnReset.Enabled = false;
+			btnReset.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			btnReset.Font = new System.Drawing.Font("Segoe UI", 10F);
+			btnReset.Location = new System.Drawing.Point(564, 15);
+			btnReset.Margin = new System.Windows.Forms.Padding(4);
+			btnReset.Name = "btnReset";
+			btnReset.Size = new System.Drawing.Size(62, 38);
+			btnReset.TabIndex = 7;
+			btnReset.Text = "Reset";
+			toolTip.SetToolTip(btnReset, "Reset this virtual machine by simulating a power cycle");
+			btnReset.UseVisualStyleBackColor = true;
+			btnReset.Click += btnReset_Click;
+			// 
+			// trayIcon
+			// 
+			trayIcon.ContextMenuStrip = cmsTrayIcon;
+			trayIcon.Icon = (System.Drawing.Icon)resources.GetObject("trayIcon.Icon");
+			trayIcon.Text = "86Box Manager";
+			trayIcon.MouseDoubleClick += trayIcon_MouseDoubleClick;
+			// 
+			// cmsTrayIcon
+			// 
+			cmsTrayIcon.ImageScalingSize = new System.Drawing.Size(20, 20);
+			cmsTrayIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { open86BoxManagerToolStripMenuItem, settingsToolStripMenuItem, toolStripSeparator2, exitToolStripMenuItem });
+			cmsTrayIcon.Name = "cmsVM";
+			cmsTrayIcon.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+			cmsTrayIcon.Size = new System.Drawing.Size(188, 76);
+			// 
+			// open86BoxManagerToolStripMenuItem
+			// 
+			open86BoxManagerToolStripMenuItem.Name = "open86BoxManagerToolStripMenuItem";
+			open86BoxManagerToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+			open86BoxManagerToolStripMenuItem.Text = "Show 86Box Manager";
+			open86BoxManagerToolStripMenuItem.ToolTipText = "Restore the 86Box Manager window";
+			open86BoxManagerToolStripMenuItem.Click += open86BoxManagerToolStripMenuItem_Click;
+			// 
+			// settingsToolStripMenuItem
+			// 
+			settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+			settingsToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+			settingsToolStripMenuItem.Text = "Settings";
+			settingsToolStripMenuItem.ToolTipText = "Open 86Box Manager settings";
+			settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
+			// 
+			// toolStripSeparator2
+			// 
+			toolStripSeparator2.Name = "toolStripSeparator2";
+			toolStripSeparator2.Size = new System.Drawing.Size(184, 6);
+			// 
+			// exitToolStripMenuItem
+			// 
+			exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+			exitToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+			exitToolStripMenuItem.Text = "Exit";
+			exitToolStripMenuItem.ToolTipText = "Close 86Box Manager";
+			exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+			// 
+			// statusBar
+			// 
+			statusBar.ImageScalingSize = new System.Drawing.Size(20, 20);
+			statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { lblVMCount });
+			statusBar.Location = new System.Drawing.Point(0, 597);
+			statusBar.Name = "statusBar";
+			statusBar.Padding = new System.Windows.Forms.Padding(1, 0, 18, 0);
+			statusBar.Size = new System.Drawing.Size(855, 22);
+			statusBar.TabIndex = 11;
+			statusBar.Text = "statusStrip1";
+			// 
+			// lblVMCount
+			// 
+			lblVMCount.BackColor = System.Drawing.Color.Transparent;
+			lblVMCount.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			lblVMCount.Name = "lblVMCount";
+			lblVMCount.Size = new System.Drawing.Size(121, 17);
+			lblVMCount.Text = "# of virtual machines:";
+			// 
+			// btnSettings
+			// 
+			btnSettings.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+			btnSettings.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			btnSettings.Font = new System.Drawing.Font("Segoe UI", 10F);
+			btnSettings.Location = new System.Drawing.Point(759, 15);
+			btnSettings.Margin = new System.Windows.Forms.Padding(4);
+			btnSettings.Name = "btnSettings";
+			btnSettings.Size = new System.Drawing.Size(81, 38);
+			btnSettings.TabIndex = 8;
+			btnSettings.Text = "Settings";
+			toolTip.SetToolTip(btnSettings, "Open 86Box Manager settings");
+			btnSettings.UseVisualStyleBackColor = true;
+			btnSettings.Click += btnSettings_Click;
+			// 
+			// frmMain
+			// 
+			AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+			AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+			BackColor = System.Drawing.SystemColors.Window;
+			ClientSize = new System.Drawing.Size(855, 619);
+			Controls.Add(statusBar);
+			Controls.Add(btnReset);
+			Controls.Add(btnCtrlAltDel);
+			Controls.Add(btnPause);
+			Controls.Add(btnConfigure);
+			Controls.Add(btnAdd);
+			Controls.Add(lstVMs);
+			Controls.Add(btnSettings);
+			Controls.Add(btnStart);
+			Controls.Add(btnDelete);
+			Controls.Add(btnEdit);
+			Font = new System.Drawing.Font("Segoe UI", 10F);
+			Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+			Margin = new System.Windows.Forms.Padding(5);
+			MinimumSize = new System.Drawing.Size(870, 613);
+			Name = "frmMain";
+			StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+			Text = "86Box Manager";
+			FormClosing += frmMain_FormClosing;
+			Load += frmMain_Load;
+			Resize += frmMain_Resize;
+			cmsVM.ResumeLayout(false);
+			cmsTrayIcon.ResumeLayout(false);
+			statusBar.ResumeLayout(false);
+			statusBar.PerformLayout();
+			ResumeLayout(false);
+			PerformLayout();
 
-        }
+		}
 
-        #endregion
-        private System.Windows.Forms.Button btnEdit;
+		#endregion
+		private System.Windows.Forms.Button btnEdit;
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.ColumnHeader clmName;

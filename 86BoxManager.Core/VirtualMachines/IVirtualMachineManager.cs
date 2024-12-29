@@ -16,8 +16,6 @@ public interface IVirtualMachineManager
 
 	Result<VirtualMachineInfo> ImportVirtualMachine(string sourcePath, string name, string description);
 
-	Result CloneVirtualMachine();
-
 	Result StartVirtualMachine();
 
 	Result StopVirtualMachine();
@@ -27,4 +25,6 @@ public interface IVirtualMachineManager
 	Result PauseVirtualMachine();
 
 	Result ResumeVirtualMachine();
+
+	Result ClearCmos(VirtualMachineInfo virtualMachineInfo);
 }
