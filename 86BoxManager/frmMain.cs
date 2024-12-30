@@ -58,12 +58,6 @@ public partial class frmMain : Form
 		LoadSettings();
 		LoadVMs();
 
-		//Load main window's state, size and position
-		//BUGBUG: Restoring these causes anchor problems, so we're not doing it anymore...
-		/*WindowState = Settings.Default.WindowState;
-		Size = Settings.Default.WindowSize;
-		Location = Settings.Default.WindowPosition;*/
-
 		//Load listview column widths
 		clmName.Width = Settings.Default.NameColWidth;
 		clmStatus.Width = Settings.Default.StatusColWidth;
@@ -497,12 +491,6 @@ public partial class frmMain : Form
 
 			e.Cancel = false;
 		}
-
-		//Save main window's state, size and position
-		//BUGBUG: Restoring these on startup causes anchor problems, so we're not doing it anymore...
-		/*Settings.Default.WindowState = WindowState;
-		Settings.Default.WindowSize = Size;
-		Settings.Default.WindowPosition = Location;*/
 
 		//Save listview column widths
 		Settings.Default.NameColWidth = clmName.Width;
