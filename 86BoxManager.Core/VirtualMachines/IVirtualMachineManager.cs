@@ -27,4 +27,6 @@ public interface IVirtualMachineManager
 	Result ResumeVirtualMachine();
 
 	Result ClearCmos(VirtualMachineInfo virtualMachineInfo);
+
+	Result<bool> IsNameInUse(string name);
 }

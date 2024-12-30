@@ -13,4 +13,6 @@ public interface IVirtualMachineListingProvider
 	string ComputePath(string vmName);
 
 	Result RemoveVirtualMachine(VirtualMachineInfo virtualMachineInfo);
+
+	Result<bool> IsNameInUse(string name);
 }

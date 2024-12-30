@@ -17,7 +17,6 @@ using FluentResults;
 using IWshRuntimeLibrary;
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
 
 namespace EightySixBoxManager;
 
@@ -961,38 +960,15 @@ public partial class frmMain : Form
 	//Checks if a VM with this name already exists
 	public bool VMCheckIfExists(string name)
 	{
-		try
-		{
-			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box\Virtual Machines", true);
-			if (regkey == null) //Regkey doesn't exist yet
-			{
-				regkey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\86Box", true);
-				if (regkey == null)
-				{
-					throw new ArgumentNullException(); ;
-				}
+		Result<bool> nameInUseResult = _virtualMachineManager.IsNameInUse(name);
 
-				regkey.CreateSubKey(@"Virtual Machines");
-				return false;
-			}
-
-			//VM's registry value doesn't exist yet
-			if (regkey.GetValue(name) == null)
-			{
-				regkey.Close();
-				return false;
-			}
-			else
-			{
-				regkey.Close();
-				return true;
-			}
-		}
-		catch (Exception)
+		if (nameInUseResult.IsFailed)
 		{
-			MessageBox.Show("Could not load the virtual machine information from the registry. Make sure you have the required permissions and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			MessageBox.Show("Could not load the virtual machine informations. Make sure you have the required permissions and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			return false;
 		}
+
+		return nameInUseResult.Value;
 	}
 
 	//Changes a VM's name and/or description

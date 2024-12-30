@@ -175,6 +175,11 @@ public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachine
 		throw new System.NotImplementedException();
 	}
 
+	public Result<bool> IsNameInUse(string name)
+	{
+		return _virtualMachineListingProvider.IsNameInUse(name);
+	}
+
 	public Result ClearCmos(VirtualMachineInfo virtualMachineInfo)
 	{
 		try

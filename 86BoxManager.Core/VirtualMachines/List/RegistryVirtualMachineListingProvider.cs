@@ -132,4 +132,31 @@ public class RegistryVirtualMachineListingProvider(ISettingsProvider settingsPro
 			return new ExceptionalError(ex);
 		}
 	}
+
+	public Result<bool> IsNameInUse(string name)
+	{
+		try
+		{
+			RegistryKey? regkey = Registry.CurrentUser.OpenSubKey(VM_KEY, true);
+
+			if (regkey == null)
+			{
+				// In this case, if we can't find the VM subkey, it means no VM exists
+				return false;
+			}
+
+			if (regkey.GetValue(name) is not null)
+			{
+				regkey.Close();
+				return true;
+			}
+
+			regkey.Close();
+			return false;
+		}
+		catch (Exception ex)
+		{
+			return new ExceptionalError(ex);
+		}
+	}
 }
