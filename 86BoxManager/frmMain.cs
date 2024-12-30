@@ -38,6 +38,20 @@ public partial class frmMain : Form
 		public int cbData;
 		public IntPtr lpData;
 	}
+
+	private const int MSG_WM_COPYDATA = 0x004A;
+
+	private const int MSG_86BOX_MAINWIN_INITIALIZED = 0x8891;
+	private const int MSG_86BOX_VM_PAUSED_OR_RESUMED = 0x8895;
+	private const int MSG_86BOX_DIALOG_OPENED = 0x8896;
+	private const int MSG_86BOX_SHUTDOWN_CONFIRMED = 0x8897;
+
+	private const int MSG_REQ_SHOW_SETTINGS = 0x8889;
+	private const int MSG_REQ_PAUSE_TOGGLE = 0x8890;
+	private const int MSG_REQ_HARD_RESET = 0x8892;
+	private const int MSG_REQ_SHUTDOWN = 0x8893;
+	private const int MSG_REQ_CTRL_ALT_DEL = 0x8894;
+
 	private string hWndHex = "";  //Window handle of this window  
 
 	private readonly ISettingsProvider _settingsProvider;
@@ -526,7 +540,7 @@ public partial class frmMain : Form
 			return;
 		}
 
-		PostMessage(vm.RunningWindowHandle, 0x8890, IntPtr.Zero, IntPtr.Zero);
+		PostMessage(vm.RunningWindowHandle, MSG_REQ_PAUSE_TOGGLE, IntPtr.Zero, IntPtr.Zero);
 		lstVMs.SelectedItems[0].SubItems[1].Text = GetDisplayFriendlyStatus(vm.Status);
 		lstVMs.SelectedItems[0].ImageIndex = 2;
 		pauseToolStripMenuItem.Text = "Resume";
@@ -552,7 +566,7 @@ public partial class frmMain : Form
 			return;
 		}
 
-		PostMessage(vm.RunningWindowHandle, 0x8890, IntPtr.Zero, IntPtr.Zero);
+		PostMessage(vm.RunningWindowHandle, MSG_REQ_PAUSE_TOGGLE, IntPtr.Zero, IntPtr.Zero);
 		vm.Status = VirtualMachineStatus.Running;
 		lstVMs.SelectedItems[0].SubItems[1].Text = GetDisplayFriendlyStatus(vm.Status);
 		lstVMs.SelectedItems[0].ImageIndex = 1;
@@ -676,7 +690,7 @@ public partial class frmMain : Form
 		{
 			if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 			{
-				PostMessage(vm.RunningWindowHandle, 0x8893, new IntPtr(1), IntPtr.Zero);
+				PostMessage(vm.RunningWindowHandle, MSG_REQ_SHUTDOWN, new IntPtr(1), IntPtr.Zero);
 			}
 		}
 		catch (Exception)
@@ -700,7 +714,7 @@ public partial class frmMain : Form
 		{
 			if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 			{
-				PostMessage(vm.RunningWindowHandle, 0x8893, IntPtr.Zero, IntPtr.Zero);
+				PostMessage(vm.RunningWindowHandle, MSG_REQ_SHUTDOWN, IntPtr.Zero, IntPtr.Zero);
 				SetForegroundWindow(vm.RunningWindowHandle);
 			}
 		}
@@ -747,7 +761,7 @@ public partial class frmMain : Form
 		//If the VM is already running, only send the message to open the settings window. Otherwise, start the VM with the -S parameter
 		if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 		{
-			PostMessage(vm.RunningWindowHandle, 0x8889, IntPtr.Zero, IntPtr.Zero);
+			PostMessage(vm.RunningWindowHandle, MSG_REQ_SHOW_SETTINGS, IntPtr.Zero, IntPtr.Zero);
 			SetForegroundWindow(vm.RunningWindowHandle);
 		}
 		else if (vm.Status is VirtualMachineStatus.Stopped)
@@ -829,7 +843,7 @@ public partial class frmMain : Form
 
 		if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 		{
-			PostMessage(vm.RunningWindowHandle, 0x8894, IntPtr.Zero, IntPtr.Zero);
+			PostMessage(vm.RunningWindowHandle, MSG_REQ_CTRL_ALT_DEL, IntPtr.Zero, IntPtr.Zero);
 			vm.Status = VirtualMachineStatus.Running;
 			lstVMs.SelectedItems[0].SubItems[1].Text = GetDisplayFriendlyStatus(vm.Status);
 			btnPause.Text = "Pause";
@@ -855,7 +869,7 @@ public partial class frmMain : Form
 
 		if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 		{
-			PostMessage(vm.RunningWindowHandle, 0x8892, IntPtr.Zero, IntPtr.Zero);
+			PostMessage(vm.RunningWindowHandle, MSG_REQ_HARD_RESET, IntPtr.Zero, IntPtr.Zero);
 			SetForegroundWindow(vm.RunningWindowHandle);
 		}
 		VMCountRefresh();
@@ -1094,7 +1108,7 @@ public partial class frmMain : Form
 		// 0x8895 - VM paused/resumed, wparam = 1: VM paused, wparam = 0: VM resumed
 		// 0x8896 - Dialog opened/closed, wparam = 1: opened, wparam = 0: closed
 		// 0x8897 - Shutdown confirmed
-		if (m.Msg == 0x8891)
+		if (m.Msg == MSG_86BOX_MAINWIN_INITIALIZED)
 		{
 			if (m.LParam != IntPtr.Zero && m.WParam.ToInt64() >= 0)
 			{
@@ -1115,7 +1129,7 @@ public partial class frmMain : Form
 				}
 			}
 		}
-		if (m.Msg == 0x8895)
+		if (m.Msg == MSG_86BOX_VM_PAUSED_OR_RESUMED)
 		{
 			if (m.WParam.ToInt32() == 1) //VM was paused
 			{
@@ -1174,7 +1188,7 @@ public partial class frmMain : Form
 				VMCountRefresh();
 			}
 		}
-		if (m.Msg == 0x8896)
+		if (m.Msg == MSG_86BOX_DIALOG_OPENED)
 		{
 			if (m.WParam.ToInt32() == 1)  //A dialog was opened
 			{
@@ -1240,7 +1254,7 @@ public partial class frmMain : Form
 			}
 		}
 
-		if (m.Msg == 0x8897) //Shutdown confirmed
+		if (m.Msg == MSG_86BOX_SHUTDOWN_CONFIRMED) //Shutdown confirmed
 		{
 			foreach (ListViewItem lvi in lstVMs.Items)
 			{
@@ -1300,7 +1314,7 @@ public partial class frmMain : Form
 		}
 		//This is the WM_COPYDATA message, used here to pass command line args to an already running instance
 		//NOTE: This code will have to be modified in case more command line arguments are added in the future.
-		if (m.Msg == 0x004A)
+		if (m.Msg == MSG_WM_COPYDATA)
 		{
 			//Get the VM name and find the associated LVI and VM object
 			COPYDATASTRUCT? ds = (COPYDATASTRUCT?)m.GetLParam(typeof(COPYDATASTRUCT));
