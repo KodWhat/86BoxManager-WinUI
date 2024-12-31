@@ -17,6 +17,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<ApplicationIcon>Resources\86Box-gray.ico</ApplicationIcon>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
 		<COMReference Include="IWshRuntimeLibrary">

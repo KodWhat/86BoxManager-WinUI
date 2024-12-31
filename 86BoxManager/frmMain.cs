@@ -23,12 +23,12 @@ public partial class frmMain : Form
 {
 	//Win32 API imports
 	//Posts a message to the window with specified handle - DOES NOT WAIT FOR THE RECIPIENT TO PROCESS THE MESSAGE!!!
-	[DllImport("user32.dll")]
-	public static extern int PostMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
+	[LibraryImport("user32.dll", EntryPoint = "PostMessageW")]
+	private static partial int PostMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
 
 	//Focus a window
-	[DllImport("user32.dll")]
-	public static extern int SetForegroundWindow(IntPtr hwnd);
+	[LibraryImport("user32.dll", EntryPoint = "SetForegroundWindow")]
+	private static partial int SetForegroundWindow(IntPtr hwnd);
 
 	[StructLayout(LayoutKind.Sequential)]
 	public struct COPYDATASTRUCT
@@ -1121,7 +1121,7 @@ public partial class frmMain : Form
 			return;
 		}
 
-		PostMessage(vm.RunningWindowHandle, MSG_REQ_PAUSE_TOGGLE, IntPtr.Zero, IntPtr.Zero);
+		_ = PostMessage(vm.RunningWindowHandle, MSG_REQ_PAUSE_TOGGLE, IntPtr.Zero, IntPtr.Zero);
 		lstVMs.SelectedItems[0].SubItems[1].Text = GetDisplayFriendlyStatus(vm.Status);
 		lstVMs.SelectedItems[0].ImageIndex = 2;
 		pauseToolStripMenuItem.Text = "Resume";
@@ -1147,7 +1147,7 @@ public partial class frmMain : Form
 			return;
 		}
 
-		PostMessage(vm.RunningWindowHandle, MSG_REQ_PAUSE_TOGGLE, IntPtr.Zero, IntPtr.Zero);
+		_ = PostMessage(vm.RunningWindowHandle, MSG_REQ_PAUSE_TOGGLE, IntPtr.Zero, IntPtr.Zero);
 		vm.Status = VirtualMachineStatus.Running;
 		lstVMs.SelectedItems[0].SubItems[1].Text = GetDisplayFriendlyStatus(vm.Status);
 		lstVMs.SelectedItems[0].ImageIndex = 1;
@@ -1271,7 +1271,7 @@ public partial class frmMain : Form
 		{
 			if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 			{
-				PostMessage(vm.RunningWindowHandle, MSG_REQ_SHUTDOWN, new IntPtr(1), IntPtr.Zero);
+				_ = PostMessage(vm.RunningWindowHandle, MSG_REQ_SHUTDOWN, new IntPtr(1), IntPtr.Zero);
 			}
 		}
 		catch (Exception)
@@ -1295,8 +1295,8 @@ public partial class frmMain : Form
 		{
 			if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 			{
-				PostMessage(vm.RunningWindowHandle, MSG_REQ_SHUTDOWN, IntPtr.Zero, IntPtr.Zero);
-				SetForegroundWindow(vm.RunningWindowHandle);
+				_ = PostMessage(vm.RunningWindowHandle, MSG_REQ_SHUTDOWN, IntPtr.Zero, IntPtr.Zero);
+				_ = SetForegroundWindow(vm.RunningWindowHandle);
 			}
 		}
 		catch (Exception)
@@ -1319,8 +1319,8 @@ public partial class frmMain : Form
 		//If the VM is already running, only send the message to open the settings window. Otherwise, start the VM with the -S parameter
 		if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 		{
-			PostMessage(vm.RunningWindowHandle, MSG_REQ_SHOW_SETTINGS, IntPtr.Zero, IntPtr.Zero);
-			SetForegroundWindow(vm.RunningWindowHandle);
+			_ = PostMessage(vm.RunningWindowHandle, MSG_REQ_SHOW_SETTINGS, IntPtr.Zero, IntPtr.Zero);
+			_ = SetForegroundWindow(vm.RunningWindowHandle);
 		}
 		else if (vm.Status is VirtualMachineStatus.Stopped)
 		{
@@ -1396,7 +1396,7 @@ public partial class frmMain : Form
 
 		if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 		{
-			PostMessage(vm.RunningWindowHandle, MSG_REQ_CTRL_ALT_DEL, IntPtr.Zero, IntPtr.Zero);
+			_ = PostMessage(vm.RunningWindowHandle, MSG_REQ_CTRL_ALT_DEL, IntPtr.Zero, IntPtr.Zero);
 			vm.Status = VirtualMachineStatus.Running;
 			lstVMs.SelectedItems[0].SubItems[1].Text = GetDisplayFriendlyStatus(vm.Status);
 			btnPause.Text = "Pause";
@@ -1417,8 +1417,8 @@ public partial class frmMain : Form
 
 		if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
 		{
-			PostMessage(vm.RunningWindowHandle, MSG_REQ_HARD_RESET, IntPtr.Zero, IntPtr.Zero);
-			SetForegroundWindow(vm.RunningWindowHandle);
+			_ = PostMessage(vm.RunningWindowHandle, MSG_REQ_HARD_RESET, IntPtr.Zero, IntPtr.Zero);
+			_ = SetForegroundWindow(vm.RunningWindowHandle);
 		}
 		VMCountRefresh();
 	}
