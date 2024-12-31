@@ -201,16 +201,12 @@ public partial class frmMain : Form
 
 	private void btnAdd_Click(object sender, EventArgs e)
 	{
-		dlgAddVM dlg = _serviceProvider.GetRequiredService<dlgAddVM>();
-		dlg.ShowDialog();
-		dlg.Dispose();
+		ShowAddDialog();
 	}
 
 	private void btnEdit_Click(object sender, EventArgs e)
 	{
-		dlgEditVM dlg = _serviceProvider.GetRequiredService<dlgEditVM>();
-		dlg.ShowDialog();
-		dlg.Dispose();
+		ShowEditDialog();
 	}
 
 	private void btnDelete_Click(object sender, EventArgs e)
@@ -220,19 +216,7 @@ public partial class frmMain : Form
 
 	private void btnStart_Click(object sender, EventArgs e)
 	{
-		if (lstVMs.SelectedItems[0].Tag is not VirtualMachineInfo vm)
-		{
-			return;
-		}
-
-		if (vm.Status is VirtualMachineStatus.Stopped)
-		{
-			VMStart();
-		}
-		else if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
-		{
-			VMRequestStop();
-		}
+		StopOrStart();
 	}
 
 	private void btnConfigure_Click(object sender, EventArgs e)
@@ -242,19 +226,7 @@ public partial class frmMain : Form
 
 	private void btnPause_Click(object sender, EventArgs e)
 	{
-		if (lstVMs.SelectedItems[0].Tag is not VirtualMachineInfo vm)
-		{
-			return;
-		}
-
-		if (vm.Status is VirtualMachineStatus.Paused)
-		{
-			VMResume();
-		}
-		else if (vm.Status is VirtualMachineStatus.Running)
-		{
-			VMPause();
-		}
+		TogglePause();
 	}
 
 	private void btnCtrlAltDel_Click(object sender, EventArgs e)
@@ -269,10 +241,7 @@ public partial class frmMain : Form
 
 	private void btnSettings_Click(object sender, EventArgs e)
 	{
-		dlgSettings dlg = _serviceProvider.GetRequiredService<dlgSettings>();
-		dlg.ShowDialog();
-		LoadSettings(); //Reload the settings due to potential changes    
-		dlg.Dispose();
+		ShowSettingsDialog();
 	}
 
 	#endregion
@@ -540,19 +509,7 @@ public partial class frmMain : Form
 	//Start VM if it's stopped or stop it if it's running/paused
 	private void startToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		if (lstVMs.SelectedItems[0].Tag is not VirtualMachineInfo vm)
-		{
-			return;
-		}
-
-		if (vm.Status is VirtualMachineStatus.Stopped)
-		{
-			VMStart();
-		}
-		else if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
-		{
-			VMRequestStop();
-		}
+		StopOrStart();
 	}
 
 	private void configureToolStripMenuItem_Click(object sender, EventArgs e)
@@ -562,19 +519,7 @@ public partial class frmMain : Form
 
 	private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		if (lstVMs.SelectedItems[0].Tag is not VirtualMachineInfo vm)
-		{
-			return;
-		}
-
-		if (vm.Status is VirtualMachineStatus.Paused)
-		{
-			VMResume();
-		}
-		else if (vm.Status is VirtualMachineStatus.Running)
-		{
-			VMPause();
-		}
+		TogglePause();
 	}
 
 	private void resetCTRLALTDELETEToolStripMenuItem_Click(object sender, EventArgs e)
@@ -599,9 +544,7 @@ public partial class frmMain : Form
 
 	private void editToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		dlgEditVM dlg = _serviceProvider.GetRequiredService<dlgEditVM>();
-		dlg.ShowDialog();
-		dlg.Dispose();
+		ShowEditDialog();
 	}
 
 	private void cloneToolStripMenuItem_Click(object sender, EventArgs e)
@@ -611,10 +554,7 @@ public partial class frmMain : Form
 			return;
 		}
 
-		dlgCloneVM dc = _serviceProvider.GetRequiredService<dlgCloneVM>();
-		dc.OldPath = vm.Path;
-		dc.ShowDialog();
-		dc.Dispose();
+		ShowCloneDialog(vm);
 	}
 
 	private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -665,7 +605,7 @@ public partial class frmMain : Form
 
 	#region Tray events
 
-	private void trayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+	private void RestoreFromMinimized()
 	{
 		//Restore the window and hide the tray icon
 		Show();
@@ -674,24 +614,20 @@ public partial class frmMain : Form
 		trayIcon.Visible = false;
 	}
 
+	private void trayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+	{
+		RestoreFromMinimized();
+	}
+
 	private void open86BoxManagerToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		Show();
-		WindowState = FormWindowState.Normal;
-		BringToFront();
-		trayIcon.Visible = false;
+		RestoreFromMinimized();
 	}
 
 	private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		Show();
-		WindowState = FormWindowState.Normal;
-		BringToFront();
-		trayIcon.Visible = false;
-		dlgSettings ds = _serviceProvider.GetRequiredService<dlgSettings>();
-		ds.ShowDialog();
-		LoadSettings();
-		ds.Dispose();
+		RestoreFromMinimized();
+		ShowSettingsDialog();
 	}
 
 	private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1052,6 +988,75 @@ public partial class frmMain : Form
 	}
 
 	#endregion
+
+	#region Show dialogs
+
+
+	private void ShowAddDialog()
+	{
+		dlgAddVM dlg = _serviceProvider.GetRequiredService<dlgAddVM>();
+		dlg.ShowDialog();
+		dlg.Dispose();
+	}
+
+	private void ShowEditDialog()
+	{
+		dlgEditVM dlg = _serviceProvider.GetRequiredService<dlgEditVM>();
+		dlg.ShowDialog();
+		dlg.Dispose();
+	}
+
+	private void ShowCloneDialog(VirtualMachineInfo vm)
+	{
+		dlgCloneVM dc = _serviceProvider.GetRequiredService<dlgCloneVM>();
+		dc.OldPath = vm.Path;
+		dc.ShowDialog();
+		dc.Dispose();
+	}
+
+	private void ShowSettingsDialog()
+	{
+		dlgSettings ds = _serviceProvider.GetRequiredService<dlgSettings>();
+		ds.ShowDialog();
+		LoadSettings();
+		ds.Dispose();
+	}
+
+	#endregion
+
+	private void StopOrStart()
+	{
+		if (lstVMs.SelectedItems[0].Tag is not VirtualMachineInfo vm)
+		{
+			return;
+		}
+
+		if (vm.Status is VirtualMachineStatus.Stopped)
+		{
+			VMStart();
+		}
+		else if (vm.Status is VirtualMachineStatus.Running or VirtualMachineStatus.Paused)
+		{
+			VMRequestStop();
+		}
+	}
+
+	private void TogglePause()
+	{
+		if (lstVMs.SelectedItems[0].Tag is not VirtualMachineInfo vm)
+		{
+			return;
+		}
+
+		if (vm.Status is VirtualMachineStatus.Paused)
+		{
+			VMResume();
+		}
+		else if (vm.Status is VirtualMachineStatus.Running)
+		{
+			VMPause();
+		}
+	}
 
 	//Load the settings from the registry
 	private void LoadSettings()
