@@ -20,13 +20,27 @@ class ListViewItemComparer : IComparer
 		this.order = order;
 	}
 
-	public int Compare(object x, object y)
+	public int Compare(object? x, object? y)
 	{
-		int returnVal = -1;
-		returnVal = string.Compare(((ListViewItem)x).SubItems[col].Text, ((ListViewItem)y).SubItems[col].Text);
+		int returnVal;
+
+		if (x is null)
+		{
+			returnVal = -1;
+		}
+		else if (y is null)
+		{
+			returnVal = 1;
+		}
+		else
+		{
+			returnVal = string.Compare(((ListViewItem)x).SubItems[col].Text, ((ListViewItem)y).SubItems[col].Text);
+		}
 
 		if (order == SortOrder.Descending)
+		{
 			returnVal *= -1;
+		}
 
 		return returnVal;
 	}
