@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows.Forms;
 
 using EightySixBoxManager.Core.Settings;
@@ -122,8 +121,6 @@ public partial class frmMain : Form
 	//Closing 86Box Manager before closing all the VMs can lead to weirdness if 86Box Manager is then restarted. So let's warn the user just in case and request confirmation.
 	private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
 	{
-		int vmCount = 0; //Number of running VMs
-
 		//Close to tray
 		if (e.CloseReason == CloseReason.UserClosing && _settingsProvider.SettingsValues.CloseToTray)
 		{
@@ -134,54 +131,68 @@ public partial class frmMain : Form
 		}
 		else
 		{
-			foreach (ListViewItem item in lstVMs.Items)
-			{
-				VirtualMachineInfo? vm = item.Tag as VirtualMachineInfo;
+			//Save listview column widths
+			Settings.Default.NameColWidth = clmName.Width;
+			Settings.Default.StatusColWidth = clmStatus.Width;
+			Settings.Default.DescColWidth = clmDesc.Width;
+			Settings.Default.PathColWidth = clmPath.Width;
 
-				if (vm is not null && vm.Status is not VirtualMachineStatus.Stopped && Visible)
-				{
-					vmCount++;
-				}
+			Settings.Default.Save();
+
+			bool continueExit = ExitApplication();
+
+			if (!continueExit)
+			{
+				e.Cancel = true;
+			}
+		}
+	}
+
+	private bool ExitApplication()
+	{
+		bool vmActive = false;
+		foreach (ListViewItem item in lstVMs.Items)
+		{
+			if (item.Tag is VirtualMachineInfo vm && vm.Status is not VirtualMachineStatus.Stopped)
+			{
+				vmActive = true;
+				break;
 			}
 		}
 
 		//If there are running VMs, display the warning and stop the VMs if user says so
-		if (vmCount > 0)
+		if (vmActive)
 		{
-			e.Cancel = true;
 			DialogResult = MessageBox.Show("Some virtual machines are still running. It's recommended you stop them first before closing 86Box Manager. Do you want to stop them now?", "Virtual machines are still running", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+			if (DialogResult == DialogResult.Cancel)
+			{
+				return false;
+			}
+
 			if (DialogResult == DialogResult.Yes)
 			{
+				lstVMs.SelectedItems.Clear();
+
 				foreach (ListViewItem lvi in lstVMs.Items)
 				{
-					lstVMs.SelectedItems.Clear(); //To prevent weird stuff
-					VirtualMachineInfo? vm = (VirtualMachineInfo?)lvi.Tag;
-					if (vm is not null && vm.Status is not VirtualMachineStatus.Stopped)
+					if (lvi.Tag is not VirtualMachineInfo vm)
+					{
+						continue;
+					}
+
+					if (vm.Status is not VirtualMachineStatus.Stopped)
 					{
 						lvi.Focused = true;
 						lvi.Selected = true;
-						VMForceStop(); //Tell the VM to shut down without confirmation
+						VMForceStop(); //Tell the VMs to stop without asking for user confirmation
 						Process p = Process.GetProcessById(vm.RunningProcessId);
 						p.WaitForExit(500); //Wait 500 milliseconds for each VM to close
 					}
 				}
-
 			}
-			else if (DialogResult == DialogResult.Cancel)
-			{
-				return;
-			}
-
-			e.Cancel = false;
 		}
 
-		//Save listview column widths
-		Settings.Default.NameColWidth = clmName.Width;
-		Settings.Default.StatusColWidth = clmStatus.Width;
-		Settings.Default.DescColWidth = clmDesc.Width;
-		Settings.Default.PathColWidth = clmPath.Width;
-
-		Settings.Default.Save();
+		return true;
 	}
 
 	#endregion
@@ -685,46 +696,7 @@ public partial class frmMain : Form
 
 	private void exitToolStripMenuItem_Click(object sender, EventArgs e)
 	{
-		int vmCount = 0;
-		foreach (ListViewItem item in lstVMs.Items)
-		{
-			if (item.Tag is VirtualMachineInfo vm && vm.Status is not VirtualMachineStatus.Stopped)
-			{
-				vmCount++;
-			}
-		}
-
-		//If there are running VMs, display the warning and stop the VMs if user says so
-		if (vmCount > 0)
-		{
-			DialogResult = MessageBox.Show("Some virtual machines are still running. It's recommended you stop them first before closing 86Box Manager. Do you want to stop them now?", "Virtual machines are still running", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
-			if (DialogResult == DialogResult.Yes)
-			{
-				foreach (ListViewItem lvi in lstVMs.Items)
-				{
-					lstVMs.SelectedItems.Clear();
-
-					if (lvi.Tag is not VirtualMachineInfo vm)
-					{
-						return;
-					}
-
-					if (vm.Status is not VirtualMachineStatus.Stopped)
-					{
-						lvi.Focused = true;
-						lvi.Selected = true;
-						VMForceStop(); //Tell the VMs to stop without asking for user confirmation
-					}
-				}
-
-				Thread.Sleep(vmCount * 500); //Wait just a bit to make sure everything goes as planned
-			}
-			else if (DialogResult == DialogResult.Cancel)
-			{
-				return;
-			}
-		}
-		Application.Exit();
+		Close();
 	}
 
 	#endregion
