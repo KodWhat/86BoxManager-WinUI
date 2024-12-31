@@ -5,19 +5,19 @@ namespace EightySixBoxManager;
 
 class ListViewItemComparer : IComparer
 {
-	private int col;
-	private SortOrder order;
+	private readonly int _col;
+	private readonly SortOrder _order;
 
 	public ListViewItemComparer()
 	{
-		col = 0;
-		order = SortOrder.Ascending;
+		_col = 0;
+		_order = SortOrder.Ascending;
 	}
 
 	public ListViewItemComparer(int column, SortOrder order)
 	{
-		col = column;
-		this.order = order;
+		_col = column;
+		_order = order;
 	}
 
 	public int Compare(object? x, object? y)
@@ -34,10 +34,10 @@ class ListViewItemComparer : IComparer
 		}
 		else
 		{
-			returnVal = string.Compare(((ListViewItem)x).SubItems[col].Text, ((ListViewItem)y).SubItems[col].Text);
+			returnVal = string.Compare(((ListViewItem)x).SubItems[_col].Text, ((ListViewItem)y).SubItems[_col].Text);
 		}
 
-		if (order == SortOrder.Descending)
+		if (_order == SortOrder.Descending)
 		{
 			returnVal *= -1;
 		}

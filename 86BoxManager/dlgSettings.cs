@@ -14,8 +14,6 @@ public partial class dlgSettings : Form
 
 	private bool settingsChanged = false; //Keeps track of unsaved changes
 
-	private readonly frmMain main = (frmMain)Application.OpenForms["frmMain"]!; //Instance of frmMain
-
 	public dlgSettings(ISettingsProvider settingsProvider)
 	{
 		_settingsProvider = settingsProvider;
