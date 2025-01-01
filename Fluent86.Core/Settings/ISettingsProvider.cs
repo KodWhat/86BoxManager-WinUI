@@ -1,8 +1,8 @@
-﻿using EightySixBoxManager.Core.Enums;
+﻿using Fluent86.Core.Enums;
 
 using FluentResults;
 
-namespace EightySixBoxManager.Core.Settings;
+namespace Fluent86.Core.Settings;
 
 public interface ISettingsProvider
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 
-using EightySixBoxManager.Core.Enums;
+using Fluent86.Core.Enums;
 
-namespace EightySixBoxManager.Core.Settings;
+namespace Fluent86.Core.Settings;
 
 public record SettingsValues
 {

@@ -4,14 +4,14 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
-using EightySixBoxManager.Core.Settings;
-using EightySixBoxManager.Core.VirtualMachines;
-using EightySixBoxManager.Core.VirtualMachines.List;
+using Fluent86.Core.Settings;
+using Fluent86.Core.VirtualMachines;
+using Fluent86.Core.VirtualMachines.List;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace EightySixBoxManager;
+namespace Fluent86;
 
 static partial class Program
 {

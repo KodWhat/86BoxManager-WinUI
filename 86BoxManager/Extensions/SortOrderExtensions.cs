@@ -1,4 +1,4 @@
-﻿namespace EightySixBoxManager.Extensions;
+﻿namespace Fluent86.Extensions;
 
 internal static class SortOrderExtensions
 {

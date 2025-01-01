@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Windows.Forms;
 
-namespace EightySixBoxManager;
+namespace Fluent86;
 
 class ListViewItemComparer : IComparer
 {

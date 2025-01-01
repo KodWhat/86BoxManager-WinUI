@@ -1,4 +1,4 @@
-﻿namespace EightySixBoxManager.Core.VirtualMachines;
+﻿namespace Fluent86.Core.VirtualMachines;
 
 public enum VirtualMachineStatus
 {

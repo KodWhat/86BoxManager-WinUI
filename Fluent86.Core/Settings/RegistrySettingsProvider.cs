@@ -1,12 +1,12 @@
 ﻿using System;
 
-using EightySixBoxManager.Core.Enums;
+using Fluent86.Core.Enums;
 
 using FluentResults;
 
 using Microsoft.Win32;
 
-namespace EightySixBoxManager.Core.Settings;
+namespace Fluent86.Core.Settings;
 
 public class RegistrySettingsProvider : ISettingsProvider
 {

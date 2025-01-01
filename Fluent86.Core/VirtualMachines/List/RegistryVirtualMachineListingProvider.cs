@@ -4,14 +4,14 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-using EightySixBoxManager.Core.Classic;
-using EightySixBoxManager.Core.Settings;
+using Fluent86.Core.Classic;
+using Fluent86.Core.Settings;
 
 using FluentResults;
 
 using Microsoft.Win32;
 
-namespace EightySixBoxManager.Core.VirtualMachines.List;
+namespace Fluent86.Core.VirtualMachines.List;
 
 public class RegistryVirtualMachineListingProvider(ISettingsProvider settingsProvider) : IVirtualMachineListingProvider
 {

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "86BoxManager", "86boxManager\86BoxManager.csproj", "{559F81B9-D1A5-45FC-AA69-E98F3B3926BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "86BoxManager.Core", "86BoxManager.Core\86BoxManager.Core.csproj", "{551A6B25-B0A5-45D6-913E-D26B545B311D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fluent86.Core", "Fluent86.Core\Fluent86.Core.csproj", "{551A6B25-B0A5-45D6-913E-D26B545B311D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

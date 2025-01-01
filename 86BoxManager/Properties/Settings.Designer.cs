@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EightySixBoxManager.Properties {
+namespace Fluent86.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

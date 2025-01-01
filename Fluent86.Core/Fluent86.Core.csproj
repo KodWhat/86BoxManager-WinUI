@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net9.0-windows</TargetFramework>
-		<RootNamespace>EightySixBoxManager.Core</RootNamespace>
+		<RootNamespace>Fluent86.Core</RootNamespace>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<!-- Used for deserializing VMs from classic application -->

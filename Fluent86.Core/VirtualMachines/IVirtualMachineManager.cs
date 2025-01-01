@@ -2,7 +2,7 @@
 
 using FluentResults;
 
-namespace EightySixBoxManager.Core.VirtualMachines;
+namespace Fluent86.Core.VirtualMachines;
 
 public interface IVirtualMachineManager
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace EightySixBoxManager.Core.Classic;
+namespace Fluent86.Core.Classic;
 
 public class ClassicSerializationBinder : SerializationBinder
 {

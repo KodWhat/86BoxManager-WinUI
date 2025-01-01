@@ -6,7 +6,7 @@ using Windows.Storage.Pickers;
 
 using WinRT.Interop;
 
-namespace EightySixBoxManager;
+namespace Fluent86;
 
 /// <summary>
 /// Present the Windows Vista-style open file dialog to select a folder. Fall back for older Windows Versions

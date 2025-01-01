@@ -6,10 +6,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-using EightySixBoxManager.Core.Settings;
-using EightySixBoxManager.Core.VirtualMachines;
-using EightySixBoxManager.Extensions;
-using EightySixBoxManager.Properties;
+using Fluent86.Core.Settings;
+using Fluent86.Core.VirtualMachines;
+using Fluent86.Extensions;
+using Fluent86.Properties;
 
 using FluentResults;
 
@@ -17,7 +17,7 @@ using IWshRuntimeLibrary;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EightySixBoxManager;
+namespace Fluent86;
 
 public partial class frmMain : Form
 {

@@ -1,4 +1,4 @@
-﻿namespace EightySixBoxManager.Core.Enums;
+﻿namespace Fluent86.Core.Enums;
 
 /// <summary>
 ///  Specifies how items in a list are sorted.

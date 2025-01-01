@@ -1,4 +1,4 @@
-﻿namespace EightySixBoxManager
+﻿namespace Fluent86
 {
     partial class dlgSettings
     {

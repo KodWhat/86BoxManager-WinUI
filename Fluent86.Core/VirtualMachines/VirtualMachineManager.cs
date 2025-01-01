@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 
-using EightySixBoxManager.Core.VirtualMachines.List;
+using Fluent86.Core.VirtualMachines.List;
 
 using FluentResults;
 
-namespace EightySixBoxManager.Core.VirtualMachines;
+namespace Fluent86.Core.VirtualMachines;
 
 public class VirtualMachineManager(IVirtualMachineListingProvider virtualMachineStorageProvider) : IVirtualMachineManager
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EightySixBoxManager.Core.Classic;
+namespace Fluent86.Core.Classic;
 
 [Serializable] //For serializing VMs so they can be stored in the registry
 internal class VM

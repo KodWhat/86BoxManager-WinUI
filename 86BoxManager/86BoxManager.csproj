@@ -39,6 +39,6 @@
 		<PackageReference Include="System.Runtime.Serialization.Formatters" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\86BoxManager.Core\86BoxManager.Core.csproj" />
+	  <ProjectReference Include="..\Fluent86.Core\Fluent86.Core.csproj" />
 	</ItemGroup>
 </Project>

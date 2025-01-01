@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EightySixBoxManager.Core.VirtualMachines;
+namespace Fluent86.Core.VirtualMachines;
 public record VirtualMachineInfo
 {
 	public required string Name { get; set; }

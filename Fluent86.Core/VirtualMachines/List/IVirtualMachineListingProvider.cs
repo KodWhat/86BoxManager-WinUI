@@ -2,7 +2,7 @@
 
 using FluentResults;
 
-namespace EightySixBoxManager.Core.VirtualMachines.List;
+namespace Fluent86.Core.VirtualMachines.List;
 
 public interface IVirtualMachineListingProvider
 {

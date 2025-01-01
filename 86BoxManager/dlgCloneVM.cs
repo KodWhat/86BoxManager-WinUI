@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 
-using EightySixBoxManager.Core.Settings;
+using Fluent86.Core.Settings;
 
-namespace EightySixBoxManager;
+namespace Fluent86;
 
 public partial class dlgCloneVM : Form
 {

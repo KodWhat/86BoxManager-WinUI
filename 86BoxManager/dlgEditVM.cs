@@ -2,10 +2,10 @@
 using System.IO;
 using System.Windows.Forms;
 
-using EightySixBoxManager.Core.Settings;
-using EightySixBoxManager.Core.VirtualMachines;
+using Fluent86.Core.Settings;
+using Fluent86.Core.VirtualMachines;
 
-namespace EightySixBoxManager;
+namespace Fluent86;
 
 public partial class dlgEditVM : Form
 {
