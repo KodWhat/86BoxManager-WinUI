@@ -10,12 +10,13 @@ namespace EightySixBoxManager;
 
 public partial class dlgSettings : Form
 {
+	private readonly ISettingsProvider _settingsProvider;
+
 	private bool settingsChanged = false; //Keeps track of unsaved changes
 
-	private readonly frmMain main = (frmMain)Application.OpenForms["frmMain"]!; //Instance of frmMain
-
-	public dlgSettings()
+	public dlgSettings(ISettingsProvider settingsProvider)
 	{
+		_settingsProvider = settingsProvider;
 		InitializeComponent();
 	}
 
@@ -149,11 +150,11 @@ public partial class dlgSettings : Form
 				LogPath = txtLogPath.Text,
 				LoggingEnabled = cbxLogging.Checked,
 				ShowGridLines = cbxGrid.Checked,
-				SortColumn = main.SettingsProvider.SettingsValues.SortColumn,
-				SortOrder = main.SettingsProvider.SettingsValues.SortOrder
+				SortColumn = _settingsProvider.SettingsValues.SortColumn,
+				SortOrder = _settingsProvider.SettingsValues.SortOrder
 			};
 
-			main.SettingsProvider.SaveSettings(newSettings);
+			_settingsProvider.SaveSettings(newSettings);
 
 			settingsChanged = CheckForChanges();
 		}
@@ -173,7 +174,7 @@ public partial class dlgSettings : Form
 	//Read the settings from the registry
 	private void LoadSettings()
 	{
-		SettingsValues currentSettings = main.SettingsProvider.SettingsValues;
+		SettingsValues currentSettings = _settingsProvider.SettingsValues;
 		PopulateBasedOnSettings(currentSettings);
 	}
 
@@ -226,7 +227,7 @@ public partial class dlgSettings : Form
 	//Checks if all controls match the currently saved settings to determine if any changes were made
 	private bool CheckForChanges()
 	{
-		SettingsValues currentSettings = main.SettingsProvider.SettingsValues;
+		SettingsValues currentSettings = _settingsProvider.SettingsValues;
 
 		btnApply.Enabled = (
 			txtEXEdir.Text != currentSettings.BoxExePath ||
@@ -276,13 +277,21 @@ public partial class dlgSettings : Form
 	private void lnkGithub2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 	{
 		lnkGithub2.LinkVisited = true;
-		Process.Start("https://github.com/86Box/86Box");
+		ProcessStartInfo startInfo = new("https://github.com/86Box/86Box")
+		{
+			UseShellExecute = true
+		};
+		Process.Start(startInfo);
 	}
 
 	private void lnkGithub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 	{
 		lnkGithub.LinkVisited = true;
-		Process.Start("https://github.com/86Box/86BoxManager");
+		ProcessStartInfo startInfo = new("https://github.com/86Box/86BoxManager")
+		{
+			UseShellExecute = true
+		};
+		Process.Start(startInfo);
 	}
 
 	private void PopulateBasedOnSettings(SettingsValues currentSettings)

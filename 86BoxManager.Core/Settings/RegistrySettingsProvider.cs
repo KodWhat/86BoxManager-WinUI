@@ -13,7 +13,6 @@ public class RegistrySettingsProvider : ISettingsProvider
 	public SettingsValues SettingsValues { get; private set; } = new SettingsValues();
 
 	private const string ROOT_KEY = @"SOFTWARE\86Box";
-	private const string VM_SUBKEY = "Virtual Machines";
 
 	public Result CreateDefaults()
 	{
@@ -28,8 +27,6 @@ public class RegistrySettingsProvider : ISettingsProvider
 			{
 				return Result.Fail($"Can't access created subkey {ROOT_KEY}");
 			}
-
-			regkey.CreateSubKey(VM_SUBKEY);
 
 			SettingsValues defaults = new SettingsValues();
 

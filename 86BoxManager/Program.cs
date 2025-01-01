@@ -4,9 +4,16 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
+using EightySixBoxManager.Core.Settings;
+using EightySixBoxManager.Core.VirtualMachines;
+using EightySixBoxManager.Core.VirtualMachines.List;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
 namespace EightySixBoxManager;
 
-static class Program
+static partial class Program
 {
 	public static string[] args = Environment.GetCommandLineArgs(); //Get command line arguments
 
@@ -14,7 +21,7 @@ static class Program
 	{
 		Hide = 0,
 		ShowNormal = 1, ShowMinimized = 2, ShowMaximized = 3,
-		Maximize = 3, ShowNormalNoActivate = 4, Show = 5,
+		ShowNormalNoActivate = 4, Show = 5,
 		Minimize = 6, ShowMinNoActivate = 7, ShowNoActivate = 8,
 		Restore = 9, ShowDefault = 10, ForceMinimized = 11
 	};
@@ -27,29 +34,33 @@ static class Program
 		public IntPtr lpData;
 	}
 
-	[DllImport("user32.dll")]
+	[LibraryImport("user32.dll", EntryPoint = "ShowWindow")]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	static extern bool ShowWindow(IntPtr hWnd, ShowWindowEnum flags);
+	private static partial bool ShowWindow(IntPtr hWnd, ShowWindowEnum flags);
 
-	[DllImport("user32.dll")]
-	private static extern int SetForegroundWindow(IntPtr hwnd);
+	[LibraryImport("user32.dll", EntryPoint = "SetForegroundWindow")]
+	private static partial int SetForegroundWindow(IntPtr hwnd);
 
-	[DllImport("user32.dll")]
-	public static extern IntPtr FindWindow(string className, string windowTitle);
+	[LibraryImport("user32.dll", EntryPoint = "FindWindowW")]
+	private static partial IntPtr FindWindow(
+		[MarshalAs(UnmanagedType.LPWStr)] string? className,
+		[MarshalAs(UnmanagedType.LPWStr)] string? windowTitle);
 
 	public const int WM_COPYDATA = 0x004A;
 
-	[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-	public static extern int SendMessage(IntPtr hwnd, int wMsg, IntPtr wParam, ref COPYDATASTRUCT lParam);
+	[LibraryImport("user32.dll", EntryPoint = "SendMessageW", SetLastError = true)]
+	private static partial int SendMessage(IntPtr hwnd, int wMsg, IntPtr wParam, ref COPYDATASTRUCT lParam);
 
-	[DllImport("shell32.dll", SetLastError = true)]
-	static extern void SetCurrentProcessExplicitAppUserModelID([MarshalAs(UnmanagedType.LPWStr)] string AppID);
+	[LibraryImport("shell32.dll", EntryPoint = "SetCurrentProcessExplicitAppUserModelID", SetLastError = true)]
+	private static partial void SetCurrentProcessExplicitAppUserModelID([MarshalAs(UnmanagedType.LPWStr)] string AppID);
 
-	[DllImport("user32.dll")]
-	private static extern bool SetProcessDPIAware();
+	[LibraryImport("user32.dll", EntryPoint = "SetProcessDPIAware")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool SetProcessDPIAware();
 
 	private static readonly string AppID = "86Box.86Box"; //For grouping windows together in Win7+ taskbar
-	private static Mutex mutex = null;
+
+	public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
 	[STAThread]
 	static void Main()
@@ -61,7 +72,7 @@ static class Program
 		const string name = "86Box Manager";
 
 		//Use a mutex to check if this is the first instance of Manager
-		mutex = new Mutex(true, name, out bool firstInstance);
+		_ = new Mutex(true, name, out bool firstInstance);
 
 		//If it's not, we need to restore and focus the existing window, as well as pass on any potential command line arguments
 		if (!firstInstance)
@@ -70,7 +81,7 @@ static class Program
 			IntPtr hWnd = FindWindow(null, "86Box Manager");
 			ShowWindow(hWnd, ShowWindowEnum.Show);
 			ShowWindow(hWnd, ShowWindowEnum.Restore);
-			SetForegroundWindow(hWnd);
+			_ = SetForegroundWindow(hWnd);
 
 			//If this second instance comes from a VM shortcut, we need to pass on the command line arguments so the VM will start
 			//in the existing instance.
@@ -82,7 +93,7 @@ static class Program
 				cds.dwData = IntPtr.Zero;
 				cds.lpData = Marshal.StringToHGlobalAnsi(message);
 				cds.cbData = message.Length;
-				SendMessage(hWnd, WM_COPYDATA, IntPtr.Zero, ref cds);
+				_ = SendMessage(hWnd, WM_COPYDATA, IntPtr.Zero, ref cds);
 			}
 
 			return;
@@ -101,7 +112,29 @@ static class Program
 			}
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new frmMain());
+
+			IHost host = CreateHostBuilder().Build();
+			ServiceProvider = host.Services;
+
+			Application.Run(ServiceProvider.GetRequiredService<frmMain>());
 		}
+	}
+
+	static IHostBuilder CreateHostBuilder()
+	{
+		return Host
+			.CreateDefaultBuilder()
+			.ConfigureServices((context, services) =>
+			{
+				services.AddTransient<frmMain>();
+				services.AddTransient<dlgSettings>();
+				services.AddTransient<dlgAddVM>();
+				services.AddTransient<dlgEditVM>();
+				services.AddTransient<dlgCloneVM>();
+
+				services.AddSingleton<ISettingsProvider, RegistrySettingsProvider>();
+				services.AddSingleton<IVirtualMachineListingProvider, RegistryVirtualMachineListingProvider>();
+				services.AddSingleton<IVirtualMachineManager, VirtualMachineManager>();
+			});
 	}
 }
